@@ -1,8 +1,8 @@
 .idea
 cookie.txt
-/images/*
-/RAW-DATA/*
-/OUTPUT-DATA/*
+/images/images-films/
+/RAW-DATA/
+/OUTPUT-DATA/
 /test/cookie.txt
 /test/videomagic/jpg/
 /test/videomagic/vtt/
