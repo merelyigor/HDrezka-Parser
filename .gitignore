@@ -4,7 +4,8 @@ cookie.txt
 /RAW-DATA/*
 /OUTPUT-DATA/*
 /test/cookie.txt
-/test/cookie.txt
+/test/videomagic/jpg/
+/test/videomagic/vtt/
 
 ### macOS ###
 # General
@@ -35,4 +36,4 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-/test/videomagic/jpg/
+
