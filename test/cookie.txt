@@ -9,3 +9,4 @@
 #HttpOnly_.hdrezka.tv	TRUE	/	FALSE	1612766781	__cfduid	dfc834175821a6bb5f114bb387195b4611610174781
 #HttpOnly_.hdrezka.tv	TRUE	/	FALSE	0	PHPSESSID	3egofmf3tvcds5rn6gt9331kb5
 #HttpOnly_.hdrezka.tv	TRUE	/	FALSE	1641710781	dle_user_token	5a26f88441d56378b4815eb2373f5362
+#HttpOnly_.hdrezka.website	TRUE	/	FALSE	1641901938	dle_user_taken	1
