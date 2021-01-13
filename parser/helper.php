@@ -13,7 +13,7 @@ function dd($var_dump, $die = false)
     if ($die) {
         die();
     }
-    exit();
+    exit;
 }
 
 function dd_($var_dump)
@@ -33,7 +33,7 @@ class Helper
     /**
      * Start of execution
      */
-    public static function start()
+    public static function start_micro_time()
     {
         self::$start = microtime(true);
     }
@@ -42,7 +42,7 @@ class Helper
      * Difference between current timestamp and self::$ start
      * @return float
      */
-    public static function finish()
+    public static function finish_micro_time()
     {
         return microtime(true) - self::$start;
     }
@@ -128,7 +128,7 @@ class Helper
             return $header;
         else
             echo $header . $error;
-        exit();
+        exit;
     }
 
     public static function num_word($value, $words, $show = true)
@@ -181,10 +181,10 @@ class Helper
         return (!empty($res) ? $res : null);
     }
 
-    public static function spinner()
+    public static function spinner_wrap()
     {
         static $num = 0;
-        $spinner = 'spinner error d7r9d2b3m4e6';
+        $spinner = 'spinner error d0r9d2b3m4e6';
         $num++;
         if ($num == 5)
             $num = 1;
@@ -201,6 +201,62 @@ class Helper
         return $spinner;
     }
 
+    public static function spinner()
+    {
+        static $num = 0;
+        $spinner = 'spinner error d7r9d2b6m4e6';
+        $num++;
+        if ($num == 5)
+            $num = 1;
+
+        if ($num == 1)
+            $spinner = '[/]';
+        if ($num == 2)
+            $spinner = '[-]';
+        if ($num == 3)
+            $spinner = '[\\]';
+        if ($num == 4)
+            $spinner = '[|]';
+
+        return $spinner;
+    }
+
+    public static function spinner_hourglass_wrap()
+    {
+        static $num = 0;
+        $spinner = 'spinner error d7r2d2b8m3e6';
+        $num++;
+        if ($num == 4)
+            $num = 1;
+
+        if ($num == 1)
+            $spinner = '⌛';
+        if ($num == 2)
+            $spinner = '⏳';
+        if ($num == 3)
+            $spinner = '🔥';
+
+        return $spinner;
+    }
+
+    public static function spinner_hourglass()
+    {
+        static $num = 0;
+        $spinner = 'spinner error d1r2d2b2m3e6';
+        $num++;
+        if ($num == 4)
+            $num = 1;
+
+        if ($num == 1)
+            $spinner = '⌛';
+        if ($num == 2)
+            $spinner = '⏳';
+        if ($num == 3)
+            $spinner = '🔥';
+
+        return $spinner;
+    }
+
     public static function how_much_time_is_left($total_terations, $completed_terations, $seconds_spent_completed_terations)
     {
         return round(((($total_terations - $completed_terations) / $completed_terations) * $seconds_spent_completed_terations), 0);
@@ -213,13 +269,13 @@ class Helper
         $static = 5;
         if ($count == $static) {
             $count = 0;
-            $seconds_spent_completed_terations = self::finish();
+            $seconds_spent_completed_terations = self::finish_micro_time();
             $time_left = (((($total_terations - $completed_terations) + 1) / ($static)) * $seconds_spent_completed_terations);
             return $time_left;
         }
 
         if ($count == 0) {
-            self::start();
+            self::start_micro_time();
         }
 
         $count++;
@@ -280,13 +336,20 @@ class Helper
             ');
     }
 
+    public static function formatBytes($bytes, $precision = 2)
+    {
+        $base = log($bytes, 1024);
+        $suffixes = array('Byte', 'kilobyte', 'Megabyte', 'Gigabyte', 'Terabyte');
+        return round(pow(1024, $base - floor($base)), $precision) . ' ' . $suffixes[floor($base)];
+    }
+
     public static function tor_proxy_9150_curl($url)
     {
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_ENCODING, TRUE);
         curl_setopt($curl, CURLOPT_TIMEOUT, 60);
         curl_setopt($curl, CURLOPT_HTTPGET, 1);
-        curl_setopt($curl, CURLOPT_PROXY, '127.0.0.1:9150');
+        curl_setopt($curl, CURLOPT_PROXY, '127.0.0.1:9050');
         curl_setopt($curl, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
 
 
@@ -343,7 +406,7 @@ class Helper
                 Ты все проебал !!!
                 Начинай заново)
                 ';
-                exit();
+                exit;
             } else
                 return self::tor_proxy_9150_curl($url);
         }

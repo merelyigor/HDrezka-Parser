@@ -3,7 +3,7 @@
 function dd($var_dump)
 {
     var_dump($var_dump);
-    exit();
+    exit;
 }
 
 // Исходное изображение

@@ -84,15 +84,16 @@ class ParserHD
                 $how_much_is_left_until_the_end_2 = Helper::how_much_time_is_left_2($max_num_pages, $page);
                 $total_number_of_pagination_pages = Helper::num_word($max_num_pages, ['Страница пагинации', 'Страницы пагинации', 'Страниц пагинаций']);
                 $counter_of_parsed = Helper::num_word($page, ['Страница пагинации', 'Страницы пагинации', 'Страниц пагинаций']);
+                $spinner_hourglass = Helper::spinner_hourglass_wrap();
                 $message = Helper::header_print(true) . "
                 
-    Всего найдено $total_number_of_pagination_pages
+    Всего найдено ✅ $total_number_of_pagination_pages ✅
 
-    Уже спарсилось $counter_of_parsed
+    Уже спарсилось 🔥{$spinner_hourglass} $counter_of_parsed {$spinner_hourglass}🔥
             
-    Время парсинга текущей страницы пагинации ==> ($this_time)
+    Время парсинга текущей страницы пагинации ➤ ⌚ $this_time ⌚
 
-    Время парсинга первой страници пагинации ==> ($start_time)";
+    Время парсинга первой страници пагинации ➤ ⌚ $start_time ⌚";
 
                 # NEXT PARSER RUN
                 $result = $this->parsing_data_by_fields_movie_page(
@@ -108,6 +109,8 @@ class ParserHD
                 $result['pagination'] = $page;
                 $result['count_pars_films'] = $movie;
                 $page++;
+                $GLOBALS['total_memory_bytes_global'] = memory_get_peak_usage() - $GLOBALS['base_memory_global'];
+                $result['pre_total_memory_bytes_global'] = $GLOBALS['total_memory_bytes_global'];
             }
             return $result;
         } else
@@ -164,6 +167,7 @@ class ParserHD
         if ($html->innertext != '' && count($html->find('div.b-content__inline_item-link'))) {
             $films_arr = $html->find('div.b-content__inline_item-link');
             $spinner = Helper::spinner();
+            $spinner_hourglass = Helper::spinner_hourglass();
             $loader = Helper::loader();
             $pagination_text = Helper::num_word($pagination, ['Странице', 'Страницах', 'Страницах']);
             foreach ($films_arr as $key => $film) {
@@ -171,18 +175,21 @@ class ParserHD
 
                 $GLOBALS['count_pars_total_urls'] = $GLOBALS['count_pars_total_urls'] + 1;
                 $parsed_urls_counter_text = Helper::num_word($GLOBALS['count_pars_total_urls'], ['Урл', 'Урла', 'Урлов']);
+                $total_memory_text = Helper::formatBytes($GLOBALS['total_memory_bytes_global'], 3);
                 Helper::clear();
                 $message = "$pre_message
 
     {$spinner} {$loader} {$spinner}
 
-    Счетчик количества спарсенных урлов ==> $parsed_urls_counter_text на {$pagination_text} пагинации
+    Счетчик количества спарсенных урлов ➤ ✅{$spinner_hourglass} $parsed_urls_counter_text {$spinner_hourglass}✅ на {$pagination_text} пагинации
             
-    Время выполнения скрипта парсинга фильмов ==> ( {$time_script_run} )
+    Время выполнения скрипта парсинга фильмов ➤ ⌚ {$time_script_run} ⌚
+    
+    Скрипт сожрал памяти ➤ ⚡ {$total_memory_text} ⚡
 
-    {$spinner}  До конца выполнения скрипта осталось ==> ( {$how_much_is_left_until_the_end} )  {$spinner}
+    {$spinner}  До конца выполнения скрипта осталось ➤ ⌚ {$how_much_is_left_until_the_end} ⌚  {$spinner}
 
-    {$spinner}  До конца выполнения скрипта осталось ==> ( {$how_much_is_left_until_the_end_2} )  {$spinner}
+    {$spinner}  До конца выполнения скрипта осталось ➤ ⌚ {$how_much_is_left_until_the_end_2} ⌚  {$spinner}
     ";
                 echo $message;
                 $temp_link = $film->find('a')[0];

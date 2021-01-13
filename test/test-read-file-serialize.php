@@ -10,7 +10,7 @@ define('ENABLE_SCRIPT', true); // true to make the script work and false to disa
 function run_($line)
 {
     var_dump(unserialize($line));
-//    exit();
+//    exit;
 }
 
 function main($args)

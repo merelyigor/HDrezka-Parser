@@ -10,6 +10,7 @@ error_reporting(E_ERROR | E_PARSE);
 ini_set('memory_limit', '8192M');
 ini_set('max_execution_time', '9000');
 ini_set('default_socket_timeout', '100000');
+$start_using_script_memory_global = memory_get_peak_usage();
 
 ########################################################################################
 # Declaring super globals variable
