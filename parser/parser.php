@@ -19,14 +19,16 @@ class ParserHD
     {
         $movie_name_ru = str_replace(' ', '%20', $movie_name_ru);
         $movie_name_en = str_replace(' ', '%20', $movie_name_en);
+        if (empty($movie_name_en))
+            $movie_name_en = $movie_name_ru;
 
         $path = 'https://www.themoviedb.org/t/p/w600_and_h900_bestv2';
 
         $url_api_ru = "https://api.themoviedb.org/3/search/movie?api_key=39afda4f996c1aec7d5df75dab74bca0&language=ru-RU&query=$movie_name_ru";
         $url_api_en = "https://api.themoviedb.org/3/search/movie?api_key=39afda4f996c1aec7d5df75dab74bca0&language=en-US&query=$movie_name_en";
-        $result_API = Helper::curl_API_films_themoviedb($url_api_ru);
+        $result_API = Helper::super_duper_curl($url_api_ru, [], false, $GLOBALS['proxy_type_global'], true, true, false, '0005');
         if (!$result_API['total_pages']) {
-            $result_API = Helper::curl_API_films_themoviedb($url_api_en);
+            $result_API = Helper::super_duper_curl($url_api_en, [], false, $GLOBALS['proxy_type_global'], true, true, false, '0006');
             if (!$result_API['total_pages'])
                 return null;
             $img_slug = (!empty($this->poster_api_check($result_API['results'])) ? $this->poster_api_check($result_API['results']) : null);
@@ -38,14 +40,14 @@ class ParserHD
             $arr['movie_poster_file_name'] = preg_replace('/^(\/)/', '', $img_slug);
             $arr['movie_poster_url'] = $path . $img_slug;
         } else {
-            $result_API_desc = Helper::curl_API_films_themoviedb($url_api_en);
+            $result_API_desc = Helper::super_duper_curl($url_api_en, [], false, $GLOBALS['proxy_type_global'], true, true, false, '0007');
             if (!$result_API_desc['total_pages'])
                 return null;
             $movie_desc = preg_replace('/<br>|<br \/>|<\/br>|<\/ br>|\\n/', '', $result_API_desc['results'][0]['overview']);
             $translate_desc = Helper::google_translate($movie_desc, 'en', 'ru');
             $arr['movie_desc'] = !empty($translate_desc) ? $translate_desc : null;
 
-            $result_API = Helper::curl_API_films_themoviedb($url_api_ru);
+            $result_API = Helper::super_duper_curl($url_api_ru, [], false, $GLOBALS['proxy_type_global'], true, true, false, '0008');
             if (!$result_API['total_pages'])
                 return null;
             $img_slug = (!empty($this->poster_api_check($result_API['results'])) ? $this->poster_api_check($result_API['results']) : null);
@@ -63,7 +65,7 @@ class ParserHD
 ##############################################################################################################
     public function get_media_urls_by_pagination_page($url)
     {
-        $content_html = Helper::hack_curl_https_content($url, $GLOBALS['proxy_type_global']);
+        $content_html = Helper::super_duper_curl($url, [], false, $GLOBALS['proxy_type_global'], false, true, false, '0009');
         $html = $this->html->load($content_html);
         $result = '';
         $start_time = null;
@@ -162,7 +164,7 @@ class ParserHD
     public function parsing_data_by_fields_movie_page($url, $pre_message, $pagination, $how_much_is_left_until_the_end, $how_much_is_left_until_the_end_2, $time_script_run)
     {
         $count_pars_movie = 0;
-        $content_html = Helper::hack_curl_https_content($url, $GLOBALS['proxy_type_global']);
+        $content_html = Helper::super_duper_curl($url, [], false, $GLOBALS['proxy_type_global'], false, true, false, '0010');
         $html = $this->html->load($content_html);
         if ($html->innertext != '' && count($html->find('div.b-content__inline_item-link'))) {
             $films_arr = $html->find('div.b-content__inline_item-link');
@@ -208,7 +210,8 @@ class ParserHD
 ##############################################################################################################
     public function save_raw_one_films_data($url)
     {
-        $content_html = Helper::hack_curl_https_content($url, $GLOBALS['proxy_type_global']);
+        $arr = [];
+        $content_html = Helper::super_duper_curl($url, [], false, $GLOBALS['proxy_type_global'], false, true, false, '0011');
         $html = $this->html->load($content_html);
 
         if ($html->innertext != '') {
@@ -216,35 +219,35 @@ class ParserHD
             $temp_film_info = $html->find('table.b-post__info')[0];
 
             if ($html->find('div.b-post__title')[0]->plaintext != '')
-                $arr['film_title'] = Helper::check($html->find('div.b-post__title')[0]->find('h1', 0)->plaintext, '54');
+                $arr['film_title'] = Helper::check($html->find('div.b-post__title')[0]->find('h1', 0)->plaintext, '219');
             else
                 $arr['film_title'] = null;
 
             if ($html->find('div.b-post__origtitle')[0]->plaintext != '')
-                $arr['film_orig_title'] = Helper::check($html->find('div.b-post__origtitle')[0]->plaintext, '54');
+                $arr['film_orig_title'] = Helper::check($html->find('div.b-post__origtitle')[0]->plaintext, '224');
             else
                 $arr['film_orig_title'] = null;
 
             if ($temp_film_info->find('span.imdb')[0]->plaintext != '')
-                $arr['film_imdb_rating'] = Helper::check($temp_film_info->find('span.imdb')[0]->find('span', 0)->plaintext, '55');
+                $arr['film_imdb_rating'] = Helper::check($temp_film_info->find('span.imdb')[0]->find('span', 0)->plaintext, '229');
             else
                 $arr['film_imdb_rating'] = null;
 
             if ($temp_film_info->find('span.kp')[0]->plaintext != '')
-                $arr['film_kino_poisk_rating'] = Helper::check($temp_film_info->find('span.kp')[0]->find('span', 0)->plaintext, '55');
+                $arr['film_kino_poisk_rating'] = Helper::check($temp_film_info->find('span.kp')[0]->find('span', 0)->plaintext, '234');
             else
                 $arr['film_kino_poisk_rating'] = null;
 
-            $temp = preg_replace('/<br>|<br \/>|<\/br>|<\/ br>|\\n/', '', Helper::check($html->find('div.b-post__description_text')[0]->innertext, '75'));
+            $temp = preg_replace('/<br>|<br \/>|<\/br>|<\/ br>|\\n/', '', Helper::check($html->find('div.b-post__description_text')[0]->innertext, '238'));
             $arr['film_desc_str'] = !empty($temp) ? $temp : null;
 
             foreach ($temp_film_info->find('tr') as $item) {
                 if (preg_match('/Слоган/', $item->plaintext)) {
-                    $temp = preg_replace('/&laquo;|&raquo;/', '', Helper::check($item->find('td', 1)->plaintext, '56'));
+                    $temp = preg_replace('/&laquo;|&raquo;/', '', Helper::check($item->find('td', 1)->plaintext, '243'));
                     $arr['film_slogan_str'] = !empty($temp) ? $temp : null;
                 }
                 if (preg_match('/(Дата выхода)/', $item->plaintext)) {
-                    $temp = Helper::check($item->find('td', 1)->plaintext, '57');
+                    $temp = Helper::check($item->find('td', 1)->plaintext, '247');
                     $arr['film_year_str'] = !empty($temp) ? $temp : null;
                     if (preg_match('/181[2-9]|18[2-9]\d|19\d\d|2\d{3}|30[0-3]\d|304[0-8]/', $arr['film_year_str'], $match)) {
                         $temp = intval($match[0]);
@@ -252,82 +255,84 @@ class ParserHD
                     }
                 }
                 if (preg_match('/Страна/', $item->plaintext)) {
-                    $temp = Helper::check($item->find('td', 1)->plaintext, '58');
+                    $temp = Helper::check($item->find('td', 1)->plaintext, '255');
                     $arr['film_country_str'] = !empty($temp) ? $temp : null;
                 }
                 if (preg_match('/Режиссер/', $item->plaintext))
                     foreach ($item->find('a') as $value) {
-                        $temp = Helper::check($value->plaintext, '60');
+                        $temp = Helper::check($value->plaintext, '260');
                         $arr['film_persons_arr'][] = !empty($temp) ? $temp : null;
                     }
                 if (preg_match('/Жанр/', $item->plaintext))
                     foreach ($item->find('a') as $value) {
-                        $temp = Helper::check($value->plaintext, '63');
+                        $temp = Helper::check($value->plaintext, '265');
                         $arr['film_genre_arr'][] = !empty($temp) ? $temp : null;
                     }
                 if (preg_match('/В качестве/', $item->plaintext)) {
-                    $temp = Helper::check($item->find('td', 1)->plaintext, '65');
+                    $temp = Helper::check($item->find('td', 1)->plaintext, '269');
                     $arr['film_quality_str'] = !empty($temp) ? $temp : null;
                 }
                 if (preg_match('/В переводе/', $item->plaintext)) {
-                    $temp = Helper::check($item->find('td', 1)->plaintext, '66');
+                    $temp = Helper::check($item->find('td', 1)->plaintext, '273');
                     $arr['film_translation_str'] = !empty($temp) ? $temp : null;
                 }
                 if (preg_match('/Возраст/', $item->plaintext)) {
-                    $temp = Helper::check($item->find('td', 1)->plaintext, '67');
+                    $temp = Helper::check($item->find('td', 1)->plaintext, '277');
                     $arr['film_age_check_str'] = !empty($temp) ? $temp : null;
                 }
                 if (preg_match('/Время/', $item->plaintext)) {
-                    $temp = Helper::check($item->find('td', 1)->plaintext, '67');
+                    $temp = Helper::check($item->find('td', 1)->plaintext, '281');
                     $arr['film_duration_str'] = !empty($temp) ? $temp : null;
                 }
                 if (preg_match('/Из серии/', $item->plaintext))
                     foreach ($item->find('a') as $value) {
-                        $temp = Helper::check($value->plaintext, '70');
+                        $temp = Helper::check($value->plaintext, '286');
                         $arr['film_collection_arr'][] = !empty($temp) ? $temp : null;
                     }
                 if (preg_match('/В ролях/', $item->plaintext))
                     foreach ($item->find('a') as $value) {
-                        $temp = Helper::check($value->plaintext, '73');
+                        $temp = Helper::check($value->plaintext, '291');
                         $arr['film_actors_arr'][] = !empty($temp) ? $temp : null;
                     }
-            }
-
-            $pattern = [
-                0 => [
-                    'pattern' => '/\[360p](https?.*?\.mp4):hls:manifest\.m3u8 or (https?.*?\.mp4)/',
-                    'name' => '360p',
-                ],
-                1 => [
-                    'pattern' => '/\[480p](https?.*?\.mp4):hls:manifest\.m3u8 or (https?.*?\.mp4)/',
-                    'name' => '480p',
-                ],
-                2 => [
-                    'pattern' => '/\[720p](https?.*?\.mp4):hls:manifest\.m3u8 or (https?.*?\.mp4)/',
-                    'name' => '720p',
-                ],
-                3 => [
-                    'pattern' => '/\[1080p](https?.*?\.mp4):hls:manifest\.m3u8 or (https?.*?\.mp4)/',
-                    'name' => '1080p',
-                ],
-                4 => [
-                    'pattern' => '/\[1080p Ultra](https?.*?\.mp4):hls:manifest\.m3u8 or (https?.*?\.mp4)/',
-                    'name' => '1080p Ultra',
-                ],
-            ];
-
-            for ($i = 0; $i < 5; $i++) {
-                preg_match($pattern[$i]['pattern'], $html->find('body')[0]->innertext, $match);
-                $tmp1 = (!empty($match[1])) ? trim($match[1]) : "NOT Video {$pattern[$i]['name']}";
-                $tmp2 = (!empty($match[2])) ? trim($match[2]) : "NOT Video {$pattern[$i]['name']}";
-                $arr['film_video_arr'][$pattern[$i]['name']][0] = str_replace('\\', '', $tmp1);
-                $arr['film_video_arr'][$pattern[$i]['name']][1] = str_replace('\\', '', $tmp2);
             }
 
             $arr['film_API_arr'] = $this->get_movie_poster_by_api_themoviedb($arr['film_title'], $arr['film_orig_title']);
 
             if (!empty($arr['film_API_arr']))
                 $arr['film_img_locale_path'] = $this->save_movie_poster_img($arr['film_API_arr']);
+
+
+            $arr['film_default_urls'] = Helper::get_urls_video_preg_match($html->find('body')[0]->innertext);
+
+            if ($html->find('ul#translators-list')[0]->plaintext != '')
+                foreach ($html->find('li.b-translator__item') as $key => $translator_item) {
+                    $temp = [];
+                    $temp['film_title'] = Helper::check($translator_item->plaintext, '334');
+                    $temp['film_id'] = Helper::check($translator_item->attr['data-id'], '335');
+                    $temp['film_translator_id'] = Helper::check($translator_item->attr['data-translator_id'], '335');
+                    $temp['film_camrip'] = Helper::check($translator_item->attr['data-camrip'], '335');
+                    $temp['film_ads'] = Helper::check($translator_item->attr['data-ads'], '335');
+                    $temp['film_director'] = Helper::check($translator_item->attr['data-director'], '335');
+
+                    $url_hdrezka_ajax = 'https://hdrezka.website/ajax/get_cdn_series/';
+                    $request_parameters = [
+                        'action' => 'get_movie',
+                        'id' => $temp['film_id'],
+                        'translator_id' => $temp['film_translator_id'],
+                        'is_camrip' => $temp['film_camrip'],
+                        'is_ads' => $temp['film_ads'],
+                        'is_director' => $temp['film_director'],
+                    ];
+                    $arr['film_translation_arr'][$key] = !empty($temp) ? $temp : null;
+
+                    $response = Helper::super_duper_curl($url_hdrezka_ajax, $request_parameters, true, $GLOBALS['proxy_type_global'], false, true, false, '0012');
+                    if (!empty($response)) {
+                        if (is_array($response))
+                            $arr['film_translation_arr'][$key]['urls'] = Helper::get_urls_video_preg_match($response['url']);
+                    }
+
+                    unset($temp);
+                }
 
             return (!empty($arr) && is_array($arr)) ? $arr : 'ERROR 107';
         }

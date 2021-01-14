@@ -70,7 +70,7 @@ function main()
     
     {$spinner} {$loader} {$spinner}
     
-    Счетчик количества спарсенных фильмов ➤ 🔥{$spinner_hourglass} $count_of_the_number_of_currently_parsed_movies {$spinner_hourglass}🔥 из $spent_time_parsing_pages_text пагинации
+    Счетчик количества спарсенных фильмов ➤ ✅🔥{$spinner_hourglass} ($count_of_the_number_of_currently_parsed_movies) {$spinner_hourglass}🔥✅ из $spent_time_parsing_pages_text пагинации
                 
     Время парсинга текущего фильма ➤ ⌚ $this_time ⌚
     
