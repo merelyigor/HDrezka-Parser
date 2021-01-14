@@ -98,7 +98,7 @@ class Helper
         $request_parameters = ['chat_id' => $telegram_chatID, 'text' => $text,];
 
         # request api bot
-        self::super_duper_curl($url, $request_parameters, true, false, false, false,false,'0001');
+        self::super_duper_curl($url, $request_parameters, true, false, false, false, false, '0001');
     }
 
     public static function error_print($error = '', $return = false)
@@ -343,16 +343,16 @@ class Helper
             self::error_print('
     для super_duper_curl не передано url !!!
 ');
-        # header info
+        # информация заголовка
         $header[0] = "text/html,application/xhtml+xml,application/xml;q=0.9,application/json,image/avif,";
         $header[0] .= "image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9";
         $header[] = "Accept-Language: ru,uk;q=0.9,en;q=0.8";
 
-        # user agent info
+        # пользовательский агент global else изменить информацию
         if (!$user_agent_modify)
-            $user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 11_1_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36';
-        if ($user_agent_modify == 'google-translate')
-            $user_agent = 'AndroidTranslate/5.3.0.RC02.130475354-53000263 5.1 phone TRANSLATE_OPM5_TEST_1';
+            $user_agent = (isset($GLOBALS['user_agent_apple_mac_os_global'])) ? $GLOBALS['user_agent_apple_macos_global'] : '';
+        if (!empty($user_agent_modify) && is_string($user_agent_modify))
+            $user_agent = $user_agent_modify;
 
         # curl init
         $curl = curl_init();
@@ -405,8 +405,8 @@ class Helper
 ░░░ порт 127.0.0.1:9050 не дал возможности использовать прокси для ссоединения ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 ░░░ Выберете ниже: Повторить или Выход! ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-░░░░░░░ что угодно) Повторить ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-░░░░░░░ 0) Выход! ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░ 1) Повторить ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░ Q) Выход! ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 ";
             self::send_message_from_bot_telegram("
@@ -414,15 +414,17 @@ class Helper
 
 Серверная дата и время события ($date_time)
 
+Хеш ошибки $hash_error
+
 Место нахождения и запуска скрипта ({$_SERVER['PWD']})
 
 порт 127.0.0.1:9050 не дал возможности использовать прокси для ссоединения
 ");
             echo $message;
             $what_do_we_do = readline("ВВОД: ");
-            if ($what_do_we_do == 1) {
+            if (intval($what_do_we_do) == 1) {
                 return self::super_duper_curl($url, $request_parameters, $method_post_enable, $tor_proxy_enable, $json_decode, $return, $user_agent_modify, '0000');
-            } else if ($what_do_we_do == 0) {
+            } else if (strtolower(trim(strval($what_do_we_do))) == 'q') {
                 self::header_print();
                 echo '
                 Ты все проебал !!!
@@ -481,9 +483,9 @@ class Helper
             'sl' => $lang_input,
             'tl' => $lang_uotput
         );
-
+        $user_agent = (isset($GLOBALS['user_agent_android_translate_global'])) ? $GLOBALS['user_agent_android_translate_global'] : '';
         $url_google_translate_api = 'https://translate.google.com/translate_a/single?client=at&dt=t&dt=ld&dt=qca&dt=rm&dt=bd&dj=1&hl=uk-RU&ie=UTF-8&oe=UTF-8&inputm=2&otf=2&iid=1dd3b944-fa62-4b55-b330-74909a99969e';
-        $arr = self::super_duper_curl($url_google_translate_api, $query_data, true, false, false, true, 'google-translate','0004');
+        $arr = self::super_duper_curl($url_google_translate_api, $query_data, true, false, false, true, $user_agent, '0004');
 
         $sentences = '';
         if (isset($arr['sentences'])) {

@@ -1,10 +1,10 @@
 <?php
 /**
- * Entry point and initial script setup
+ * Точка входа и начальная настройка скрипта
  * ---------------------------------------------------------------------------------------------------------------------
  */
 ########################################################################################
-# Configuring the script window + php ini + configuring the output of errors but not warnings
+# Настройка окна скрипта + php ini + настройка вывода ошибок, но не предупреждений
 ########################################################################################
 error_reporting(E_ERROR | E_PARSE);
 ini_set('memory_limit', '8192M');
@@ -13,9 +13,9 @@ ini_set('default_socket_timeout', '100000');
 $start_using_script_memory_global = memory_get_peak_usage();
 
 ########################################################################################
-# Declaring super globals variable
+# Объявление суперглобальных переменной
 ########################################################################################
-# File or folder paths
+# Глобальные пути к файлам или папкам скрипта
 $path_repo_global = preg_replace('/parser/', '', __DIR__);
 $path_repo_raw_data_global = $path_repo_global . 'RAW-DATA';
 $path_repo_output_data_global = $path_repo_global . 'OUTPUT-DATA';
@@ -23,9 +23,20 @@ $path_repo_images_data_global = $path_repo_global . 'images/images-films/';
 $path_repo_raw_data_films_urls_csv_global = $path_repo_raw_data_global . '/films-temporal-urls.csv';
 $path_repo_raw_data_serials_urls_csv_global = $path_repo_raw_data_global . '/serials-temporal-urls.csv';
 
-# paths to url-slug for the parser
+# Глобальные юзер агенты
+# https://developers.whatismybrowser.com/useragents/explore/
+$user_agent_android_translate_global = 'AndroidTranslate/5.3.0.RC02.130475354-53000263 5.1 phone TRANSLATE_OPM5_TEST_1';
+$user_agent_apple_mac_os_global = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 11_1_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36';
+$user_agent_apple_windows10_global = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36';
+$user_agent_apple_iphone_global = 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148';
+$user_agent_apple_ipad_global = 'Mozilla/5.0 (iPad; CPU OS 14_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148';
+
+# Глобальные пути к URL-slug для парсера
 $films_slug_parser_global = 'films';
 $serials_slug_parser_global = 'series';
+
+# Глобальные URLs HDrezka AJAX
+$url_hdrezka_ajax_global = 'https://hdrezka.website/ajax/get_cdn_series/';
 
 ########################################################################################
 # Connecting dependencies and create variable + class
@@ -41,11 +52,11 @@ $error_message_invalid_user = '
 
 
 /**
- * Start executing script settings using console input
+ * Начать выполнение настроек скрипта, используя консольный ввод
  * ---------------------------------------------------------------------------------------------------------------------
  */
 ########################################################################################
-# Choosing a domain for the parser to work
+# Выбор домена для работы парсера
 ########################################################################################
 Helper::bash_escapeshellarg("printf \e[8;30;120t");
 echo Helper::header_print() . '░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -71,7 +82,7 @@ else
     Helper::error_print($error_message_invalid_user);
 ########################################################################################
 ########################################################################################
-# Choosing a parsing option with or without a proxy
+# Выбор варианта парсинга с прокси или без него
 ########################################################################################
 ########################################################################################
 echo Helper::header_print() . '░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -98,7 +109,7 @@ else
     Helper::error_print($error_message_invalid_user);
 ########################################################################################
 ########################################################################################
-# Selecting the number of pagination pages for parsing, there are about 36 films on one page if this is not the last pagination page
+# При выборе количества страниц пагинации для разбора на одной странице будет около 36 фильмов, если это не последняя страница пагинации.
 ########################################################################################
 ########################################################################################
 echo Helper::header_print() . '░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -118,7 +129,7 @@ else
     Helper::error_print($error_message_invalid_user);
 ########################################################################################
 ########################################################################################
-# Choosing a parsing type
+# Выбор типа парсинга
 ########################################################################################
 ########################################################################################
 echo Helper::header_print() . '░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░

@@ -314,7 +314,10 @@ class ParserHD
                     $temp['film_ads'] = Helper::check($translator_item->attr['data-ads'], '335');
                     $temp['film_director'] = Helper::check($translator_item->attr['data-director'], '335');
 
-                    $url_hdrezka_ajax = 'https://hdrezka.website/ajax/get_cdn_series/';
+                    $url_ajax = (isset($GLOBALS['url_hdrezka_ajax_global']))
+                        ? $GLOBALS['url_hdrezka_ajax_global']
+                        : Helper::error_print('url_hdrezka_ajax_global error f640fj2');
+
                     $request_parameters = [
                         'action' => 'get_movie',
                         'id' => $temp['film_id'],
@@ -323,14 +326,13 @@ class ParserHD
                         'is_ads' => $temp['film_ads'],
                         'is_director' => $temp['film_director'],
                     ];
-                    $arr['film_translation_arr'][$key] = !empty($temp) ? $temp : null;
 
-                    $response = Helper::super_duper_curl($url_hdrezka_ajax, $request_parameters, true, $GLOBALS['proxy_type_global'], false, true, false, '0012');
+                    $arr['film_translation_arr'][$key] = !empty($temp) ? $temp : null;
+                    $response = Helper::super_duper_curl($url_ajax, $request_parameters, true, $GLOBALS['proxy_type_global'], false, true, false, '0012');
                     if (!empty($response)) {
                         if (is_array($response))
                             $arr['film_translation_arr'][$key]['urls'] = Helper::get_urls_video_preg_match($response['url']);
                     }
-
                     unset($temp);
                 }
 
