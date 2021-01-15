@@ -151,7 +151,7 @@ function main()
     
     
     
-Файл с данными всех спарсенных фильмов тут ➤ 🚀(/RAW-DATA/{$filename_and_hash})🚀
+Файлы с данными всех спарсенных фильмов тут ➤ 🚀({$GLOBALS['path_repo_output_films_folder_global']}/$date_time_folder_name)🚀
     
 Скриптом было сьедено ➤ ⚡ {$total_memory_text} ⚡
     
