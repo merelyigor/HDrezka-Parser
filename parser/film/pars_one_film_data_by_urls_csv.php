@@ -5,7 +5,7 @@
  * @param $parser_film_url
  * @param $filename_and_hash
  */
-function run_parser_save_one_film($parser_film_url, $path_file_films_hash_folder)
+function run_parser_save_one_film_data($parser_film_url, $path_file_films_hash_folder)
 {
     # парсинг одного фильма старт *******************>
     $result_serialize_arr = serialize((new ParserHD)->parse_raw_one_films_data($parser_film_url));
@@ -111,7 +111,7 @@ function main()
 ";
                 echo $message;
                 # парсинг  сохранение одного фильма старт *******************>
-                run_parser_save_one_film($parser_film_url, $path_file_films_hash_folder);
+                run_parser_save_one_film_data($parser_film_url, $path_file_films_hash_folder);
                 # парсинг  сохранение одного фильма стоп *******************>
                 $i++;
                 $GLOBALS['total_memory_bytes_global'] = memory_get_peak_usage() - $GLOBALS['base_memory_global'];
