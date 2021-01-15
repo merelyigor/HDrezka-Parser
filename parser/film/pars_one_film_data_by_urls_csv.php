@@ -5,19 +5,21 @@
  * @param $parser_film_url
  * @param $filename_and_hash
  */
-function run_parser_save_one_film($parser_film_url, $filename_and_hash)
+function run_parser_save_one_film($parser_film_url, $path_file_films_hash_folder)
 {
+    # парсинг одного фильма старт *******************>
     $result_serialize_arr = serialize((new ParserHD)->parse_raw_one_films_data($parser_film_url));
+    # парсинг одного фильма старт *******************>
+
     $prefix = Helper::counter_output_file_prefix();
-    $path_save_output_file = "{$GLOBALS['path_repo_output_films_folder_global']}/$filename_and_hash";
-    $path_save_output_file = "{$path_save_output_file}__$prefix.txt";
+    $path_save_output_file = "{$path_file_films_hash_folder}__$prefix.txt";
     if (file_exists($path_save_output_file)) {
         $file_size = trim(strval(shell_exec("wc -c $path_save_output_file")));
         $file_size_bytes = trim(str_replace($path_save_output_file, '', $file_size));
         $file_size_mb = intval(round((($file_size_bytes / 1024) / 1024), 0));
         if ($file_size_mb >= 10) {
             $prefix = Helper::counter_output_file_prefix(true);
-            $path_save_output_file = "{$path_save_output_file}__$prefix.txt";
+            $path_save_output_file = "{$path_file_films_hash_folder}__$prefix.txt";
         }
     }
 
@@ -31,7 +33,11 @@ function main()
     $this_time = null;
     $second_parser_data = (!empty($GLOBALS['result_global_end_script_pars_films_url']) ? $GLOBALS['result_global_end_script_pars_films_url'] : null);
     ($second_parser_data['pagination'] == 0) ? $second_parser_data['pagination'] = 1 : null;
-    $filename_and_hash = 'FILMS_DATA_BY_' . date("d-m-Y_H-i-s");
+    $date_time_folder_name = date("d-m-Y_H-i-s");
+    if (!file_exists("{$GLOBALS['path_repo_output_films_folder_global']}/$date_time_folder_name")) {
+        mkdir("{$GLOBALS['path_repo_output_films_folder_global']}/$date_time_folder_name", 0777, true);
+    }
+    $path_file_films_hash_folder = "{$GLOBALS['path_repo_output_films_folder_global']}/$date_time_folder_name/FILMS_DATA_BY_";
 
     $file = fopen("{$GLOBALS['path_repo_raw_data_films_urls_csv_global']}", 'r');
     if (!file_exists($GLOBALS['path_repo_raw_data_films_urls_csv_global'])) {
@@ -104,7 +110,9 @@ function main()
 ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
 ";
                 echo $message;
-                run_parser_save_one_film($parser_film_url, $filename_and_hash);
+                # парсинг  сохранение одного фильма старт *******************>
+                run_parser_save_one_film($parser_film_url, $path_file_films_hash_folder);
+                # парсинг  сохранение одного фильма стоп *******************>
                 $i++;
                 $GLOBALS['total_memory_bytes_global'] = memory_get_peak_usage() - $GLOBALS['base_memory_global'];
             }
