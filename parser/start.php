@@ -202,8 +202,8 @@ if ($parser_type == 1) {
 } else if ($parser_type == 2) {
     # Глобальный файл где временно хранятся урлы для работы парсера
     $path_repo_raw_data_urls_csv_global = $path_repo_raw_data_global . '/serials-temporal-urls.csv';
-    if (file_exists($path_repo_raw_data_urls_csv_global))
-        unlink($path_repo_raw_data_urls_csv_global);
+//    if (file_exists($path_repo_raw_data_urls_csv_global))
+//        unlink($path_repo_raw_data_urls_csv_global);
     require 'serials/pars_serials_urls_by_pagination.php';
 } else
     Helper::error_print($error_message_invalid_user);

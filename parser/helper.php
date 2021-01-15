@@ -435,7 +435,7 @@ class Helper
         return iconv(mb_detect_encoding($str, mb_detect_order(), true), "UTF-8", $str);
     }
 
-    public static function find_last_max_page_pagination_pars_films($string)
+    public static function find_last_max_page_pagination_pars_movie($string)
     {
         preg_match('/ *(\d{1,999})$/', trim(preg_replace('/&nbsp;|&nbsp;|\.\.\.|  /', '', $string)), $m);
         $res = intval(trim($m[1]));

@@ -7,15 +7,18 @@
 
 class ParserHD
 {
+    # экземпляр simple_html_dom парсера
     private $html;
 
+    # Подключение и создание simple_html_dom парсера
     public function __construct()
     {
         $this->html = new simple_html_dom();
     }
 ##############################################################################################################
 # API private Methods
-##############################################################################################################
+
+//  получение постера записи от внешнего API themoviedb
     private function get_movie_poster_by_api_themoviedb($movie_name_ru, $movie_name_en)
     {
         $movie_name_ru = str_replace(' ', '%20', $movie_name_ru);
@@ -60,10 +63,9 @@ class ParserHD
         return $arr;
     }
 ##############################################################################################################
-##############################################################################################################
 # Pars Helper private Methods
-##############################################################################################################
-##############################################################################################################
+
+//  парсер урлов на странице пагинации
     public function get_media_urls_by_pagination_page($url)
     {
         $content_html = Helper::super_duper_curl($url, [], false, $GLOBALS['proxy_type_global'], false, true, false, '0009');
@@ -74,13 +76,13 @@ class ParserHD
 
         (!empty($GLOBALS['count_pagination_global']) && intval($GLOBALS['count_pagination_global']) != 0) ?
             $max_num_pages = intval($GLOBALS['count_pagination_global']) :
-            $max_num_pages = Helper::find_last_max_page_pagination_pars_films($html->find('div.b-navigation')[0]->plaintext);
+            $max_num_pages = Helper::find_last_max_page_pagination_pars_movie($html->find('div.b-navigation')[0]->plaintext);
 
         if ($max_num_pages >= 0) {
             $start_time_script = microtime(true);
             $page = 1;
             $movie = 0;
-            for ($I = 1; $I <= $max_num_pages; $I++) {
+            for ($processed_page = 1; $processed_page <= $max_num_pages; $processed_page++) {
                 ($page == 1) ? $start_time = date("H:i:s") : $this_time = date("H:i:s");
                 $sec = intval(round(microtime(true) - $start_time_script, 0));
                 $how_much_is_left_until_the_end = Helper::how_much_time_is_left($max_num_pages, $page, $sec);
@@ -104,8 +106,8 @@ class ParserHD
     Время парсинга первой страници пагинации ➤ ⌚ $start_time ⌚";
 
                 # NEXT PARSER RUN
-                $result = $this->parsing_data_by_fields_movie_page(
-                    $url . "/page/{$I}/",
+                $result = $this->parser_urls_on_the_page_of_one_pagination(
+                    $url . "/page/{$processed_page}/",
                     $message,
                     $page,
                     Helper::sec_to_time($how_much_is_left_until_the_end),
@@ -113,9 +115,9 @@ class ParserHD
                     Helper::sec_to_time($sec)
                 );
 
-                $movie = $movie + $result['count_pars_films_temp'];
+                $movie = $movie + $result['count_pars_movie_temp'];
                 $result['pagination'] = $page;
-                $result['count_pars_films'] = $movie;
+                $result['count_pars_movie'] = $movie;
                 $page++;
                 $GLOBALS['total_memory_bytes_global'] = memory_get_peak_usage() - $GLOBALS['base_memory_global'];
                 $result['pre_total_memory_bytes_global'] = $GLOBALS['total_memory_bytes_global'];
@@ -128,6 +130,7 @@ class ParserHD
 ');
     }
 
+//  проверка наличия постера записи от внешнего API
     private function poster_api_check($result_api)
     {
         if (is_array($result_api) && !empty($result_api))
@@ -143,6 +146,7 @@ class ParserHD
             null;
     }
 
+//  сохранение постера записи
     private function save_movie_poster_img($arr)
     {
         if (is_array($arr) && !empty($arr['movie_poster_file_name'])) {
@@ -163,22 +167,21 @@ class ParserHD
     }
 
 ##############################################################################################################
-##############################################################################################################
-# Pars public Methods for films
-##############################################################################################################
-##############################################################################################################
-    public function parsing_data_by_fields_movie_page($url, $pre_message, $pagination, $how_much_is_left_until_the_end, $how_much_is_left_until_the_end_2, $time_script_run)
+# Pars public Methods for movies
+
+//  парсер урлов на странице одной пагинации
+    public function parser_urls_on_the_page_of_one_pagination($url, $pre_message, $pagination, $how_much_is_left_until_the_end, $how_much_is_left_until_the_end_2, $time_script_run)
     {
         $count_pars_movie = 0;
         $content_html = Helper::super_duper_curl($url, [], false, $GLOBALS['proxy_type_global'], false, true, false, '0010');
         $html = $this->html->load($content_html);
         if ($html->innertext != '' && count($html->find('div.b-content__inline_item-link'))) {
-            $films_arr = $html->find('div.b-content__inline_item-link');
+            $movies_arr = $html->find('div.b-content__inline_item-link');
             $spinner = Helper::spinner();
             $spinner_hourglass = Helper::spinner_hourglass();
             $loader = Helper::loader();
             $pagination_text = Helper::num_word($pagination, ['Странице', 'Страницах', 'Страницах']);
-            foreach ($films_arr as $key => $film) {
+            foreach ($movies_arr as $key => $movie) {
                 $count_pars_movie = Helper::count_pars(!$key);
 
                 $GLOBALS['count_pars_total_urls'] = $GLOBALS['count_pars_total_urls'] + 1;
@@ -206,20 +209,22 @@ class ParserHD
 ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
 ";
                 echo $message;
-                $temp_link = $film->find('a')[0];
-                $film_url_slug = preg_replace('/http:\/\/hdrezka\.tv|https:\/\/hdrezka\.website|https:\/\/hdrezka\.sh|https:\/\/rezka\.ag/', '', $temp_link->href);
-                $film_name = $temp_link->plaintext;
-                $line_text = "$film_url_slug;$film_name \n";
+                $temp_link = $movie->find('a')[0];
+                $movie_url_slug = preg_replace('/http:\/\/hdrezka\.tv|https:\/\/hdrezka\.website|https:\/\/hdrezka\.sh|https:\/\/rezka\.ag/', '', $temp_link->href);
+                $movie_name = $temp_link->plaintext;
+                $line_text = "$movie_url_slug;$movie_name \n";
                 file_put_contents("{$GLOBALS['path_repo_raw_data_urls_csv_global']}", $line_text, FILE_APPEND);
             }
         }
         return [
             'time_script_run' => (!empty($time_script_run)) ? $time_script_run : 'менее секунды',
-            'count_pars_films_temp' => intval($count_pars_movie),
+            'count_pars_movie_temp' => intval($count_pars_movie),
         ];
     }
 
 ##############################################################################################################
+# Глобальные парсеры отдельных страниц
+
     public function parse_raw_one_films_data($url)
     {
         $arr = [];
@@ -347,6 +352,142 @@ class ParserHD
                     if (!empty($response)) {
                         if (is_array($response))
                             $arr['film_translation_arr'][$key]['urls'] = Helper::get_urls_video_preg_match($response['url']);
+                    }
+                    unset($temp);
+                }
+
+            return (!empty($arr) && is_array($arr)) ? $arr : 'ERROR 107';
+        }
+        return Helper::error_print('ERROR 355');
+    }
+
+    public function parse_raw_one_serials_data($url)
+    {
+        $arr = [];
+        $content_html = Helper::super_duper_curl($url, [], false, $GLOBALS['proxy_type_global'], false, true, false, '0011');
+        $html = $this->html->load($content_html);
+
+        if ($html->innertext != '') {
+
+            $temp_serial_info = $html->find('table.b-post__info')[0];
+
+            if ($html->find('div.b-post__title')[0]->plaintext != '')
+                $arr['serial_title'] = Helper::check($html->find('div.b-post__title')[0]->find('h1', 0)->plaintext, '219');
+            else
+                $arr['serial_title'] = null;
+
+            if ($html->find('div.b-post__origtitle')[0]->plaintext != '')
+                $arr['serial_orig_title'] = Helper::check($html->find('div.b-post__origtitle')[0]->plaintext, '224');
+            else
+                $arr['serial_orig_title'] = null;
+
+            if ($temp_serial_info->innertext != '') {
+                if ($temp_serial_info->find('span.imdb')[0]->plaintext != '')
+                    $arr['serial_imdb_rating'] = Helper::check($temp_serial_info->find('span.imdb')[0]->find('span', 0)->plaintext, '229');
+                else
+                    $arr['serial_imdb_rating'] = null;
+
+                if ($temp_serial_info->find('span.kp')[0]->plaintext != '')
+                    $arr['serial_kino_poisk_rating'] = Helper::check($temp_serial_info->find('span.kp')[0]->find('span', 0)->plaintext, '234');
+                else
+                    $arr['serial_kino_poisk_rating'] = null;
+
+                foreach ($temp_serial_info->find('tr') as $item) {
+                    if (preg_match('/Слоган/', $item->plaintext)) {
+                        $temp = preg_replace('/&laquo;|&raquo;/', '', Helper::check($item->find('td', 1)->plaintext, '243'));
+                        $arr['serial_slogan_str'] = !empty($temp) ? $temp : null;
+                    }
+                    if (preg_match('/(Дата выхода)/', $item->plaintext)) {
+                        $temp = Helper::check($item->find('td', 1)->plaintext, '247');
+                        $arr['serial_year_str'] = !empty($temp) ? $temp : null;
+                        if (preg_match('/181[2-9]|18[2-9]\d|19\d\d|2\d{3}|30[0-3]\d|304[0-8]/', $arr['serial_year_str'], $match)) {
+                            $temp = intval($match[0]);
+                            $arr['serial_year_numb'] = !empty($temp) ? $temp : null;
+                        }
+                    }
+                    if (preg_match('/Страна/', $item->plaintext)) {
+                        $temp = Helper::check($item->find('td', 1)->plaintext, '255');
+                        $arr['serial_country_str'] = !empty($temp) ? $temp : null;
+                    }
+                    if (preg_match('/Режиссер/', $item->plaintext))
+                        foreach ($item->find('a') as $value) {
+                            $temp = Helper::check($value->plaintext, '260');
+                            $arr['serial_persons_arr'][] = !empty($temp) ? $temp : null;
+                        }
+                    if (preg_match('/Жанр/', $item->plaintext))
+                        foreach ($item->find('a') as $value) {
+                            $temp = Helper::check($value->plaintext, '265');
+                            $arr['serial_genre_arr'][] = !empty($temp) ? $temp : null;
+                        }
+                    if (preg_match('/В качестве/', $item->plaintext)) {
+                        $temp = Helper::check($item->find('td', 1)->plaintext, '269');
+                        $arr['serial_quality_str'] = !empty($temp) ? $temp : null;
+                    }
+                    if (preg_match('/В переводе/', $item->plaintext)) {
+                        $temp = Helper::check($item->find('td', 1)->plaintext, '273');
+                        $arr['serial_translation_str'] = !empty($temp) ? $temp : null;
+                    }
+                    if (preg_match('/Возраст/', $item->plaintext)) {
+                        $temp = Helper::check($item->find('td', 1)->plaintext, '277');
+                        $arr['serial_age_check_str'] = !empty($temp) ? $temp : null;
+                    }
+                    if (preg_match('/Время/', $item->plaintext)) {
+                        $temp = Helper::check($item->find('td', 1)->plaintext, '281');
+                        $arr['serial_duration_str'] = !empty($temp) ? $temp : null;
+                    }
+                    if (preg_match('/Из серии/', $item->plaintext))
+                        foreach ($item->find('a') as $value) {
+                            $temp = Helper::check($value->plaintext, '286');
+                            $arr['serial_collection_arr'][] = !empty($temp) ? $temp : null;
+                        }
+                    if (preg_match('/В ролях/', $item->plaintext))
+                        foreach ($item->find('a') as $value) {
+                            $temp = Helper::check($value->plaintext, '291');
+                            $arr['serial_actors_arr'][] = !empty($temp) ? $temp : null;
+                        }
+                }
+            }
+
+            $temp = preg_replace('/<br>|<br \/>|<\/br>|<\/ br>|\\n/', '', Helper::check($html->find('div.b-post__description_text')[0]->innertext, '238'));
+            $arr['serial_desc_str'] = !empty($temp) ? $temp : null;
+
+
+            $arr['serial_API_arr'] = $this->get_movie_poster_by_api_themoviedb($arr['serial_title'], $arr['serial_orig_title']);
+
+            if (!empty($arr['serial_API_arr']))
+                $arr['serial_img_locale_path'] = $this->save_movie_poster_img($arr['serial_API_arr']);
+
+
+            $arr['serial_default_urls'] = Helper::get_urls_video_preg_match($html->find('body')[0]->innertext);
+
+            if ($html->find('ul#translators-list')[0]->plaintext != '')
+                foreach ($html->find('li.b-translator__item') as $key => $translator_item) {
+                    $temp = [];
+                    $temp['serial_title'] = Helper::check($translator_item->plaintext, '334');
+                    $temp['serial_id'] = Helper::check($translator_item->attr['data-id'], '335');
+                    $temp['serial_translator_id'] = Helper::check($translator_item->attr['data-translator_id'], '335');
+                    $temp['serial_camrip'] = Helper::check($translator_item->attr['data-camrip'], '335');
+                    $temp['serial_ads'] = Helper::check($translator_item->attr['data-ads'], '335');
+                    $temp['serial_director'] = Helper::check($translator_item->attr['data-director'], '335');
+
+                    $url_ajax = (isset($GLOBALS['url_hdrezka_ajax_global']))
+                        ? $GLOBALS['url_hdrezka_ajax_global']
+                        : Helper::error_print('url_hdrezka_ajax_global error f640fj2');
+
+                    $request_parameters = [
+                        'action' => 'get_movie',
+                        'id' => $temp['serial_id'],
+                        'translator_id' => $temp['serial_translator_id'],
+                        'is_camrip' => $temp['serial_camrip'],
+                        'is_ads' => $temp['serial_ads'],
+                        'is_director' => $temp['serial_director'],
+                    ];
+
+                    $arr['serial_translation_arr'][$key] = !empty($temp) ? $temp : null;
+                    $response = Helper::super_duper_curl($url_ajax, $request_parameters, true, $GLOBALS['proxy_type_global'], false, true, false, '0012');
+                    if (!empty($response)) {
+                        if (is_array($response))
+                            $arr['serial_translation_arr'][$key]['urls'] = Helper::get_urls_video_preg_match($response['url']);
                     }
                     unset($temp);
                 }
