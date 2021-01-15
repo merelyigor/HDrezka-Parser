@@ -37,7 +37,7 @@ function main()
     if (!file_exists("{$GLOBALS['path_repo_output_films_folder_global']}/$date_time_folder_name")) {
         mkdir("{$GLOBALS['path_repo_output_films_folder_global']}/$date_time_folder_name", 0777, true);
     }
-    $path_file_films_hash_folder = "{$GLOBALS['path_repo_output_films_folder_global']}/$date_time_folder_name/FILMS_DATA_BY_";
+    $path_file_films_hash_folder = "{$GLOBALS['path_repo_output_films_folder_global']}/$date_time_folder_name/FILMS_DATA_BY";
 
     $file = fopen("{$GLOBALS['path_repo_raw_data_films_urls_csv_global']}", 'r');
     if (!file_exists($GLOBALS['path_repo_raw_data_films_urls_csv_global'])) {
