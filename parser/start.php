@@ -1,21 +1,23 @@
 <?php
 /**
  * Точка входа и начальная настройка скрипта
- * ---------------------------------------------------------------------------------------------------------------------
+ * -------------------------------------------------------------------------------------
  */
 ########################################################################################
 # Настройка окна скрипта + php ini + настройка вывода ошибок, но не предупреждений
 ########################################################################################
+$start_using_script_memory_global = memory_get_peak_usage();
 error_reporting(E_ERROR | E_PARSE);
 ini_set('memory_limit', '8192M');
 ini_set('max_execution_time', '9999');
 ini_set('default_socket_timeout', '100000');
-$start_using_script_memory_global = memory_get_peak_usage();
 ########################################################################################
 ########################################################################################
 # Объявление суперглобальных переменной
 # Глобальные пути к файлам или папкам скрипта
 ########################################################################################
+# На сколко примерно мегабайт розбивать выходящий файл с данними после парсинга - СТРОГО ПИСАТЬ ТОЛЬКО ЦИФРУ !!!
+$max_uot_put_file_size_megabyte = 10;
 # Глобальная папка скрипта
 $path_repo_global = preg_replace('/parser/', '', __DIR__);
 # Глобальная папка для временных файлов работы скрипта
@@ -26,9 +28,7 @@ $path_repo_output_films_folder_global = $path_repo_output_data_global . '/FILMS'
 $path_repo_output_serials_folder_global = $path_repo_output_data_global . '/SERIALS';
 # Глобальная папка картинок фильмов которые были обработаны и спаршены
 $path_repo_images_data_global = $path_repo_global . 'images/images-films/';
-# Глобальный файл где временно хранятся урлы для работы парсера
-$path_repo_raw_data_films_urls_csv_global = $path_repo_raw_data_global . '/films-temporal-urls.csv';
-$path_repo_raw_data_serials_urls_csv_global = $path_repo_raw_data_global . '/serials-temporal-urls.csv';
+
 ########################################################################################
 # Глобальные юзер агенты
 # https://developers.whatismybrowser.com/useragents/explore/
@@ -194,12 +194,16 @@ echo Helper::header_print() . '░░░░░░░░░░░░░░░░�
 
 $parser_type = readline("ВВОД: ");
 if ($parser_type == 1) {
-    if (file_exists($path_repo_raw_data_films_urls_csv_global))
-        unlink($path_repo_raw_data_films_urls_csv_global);
+    # Глобальный файл где временно хранятся урлы для работы парсера
+    $path_repo_raw_data_urls_csv_global = $path_repo_raw_data_global . '/films-temporal-urls.csv';
+    if (file_exists($path_repo_raw_data_urls_csv_global))
+        unlink($path_repo_raw_data_urls_csv_global);
     require 'film/pars_films_urls_by_pagination.php';
 } else if ($parser_type == 2) {
-    if (file_exists($path_repo_raw_data_serials_urls_csv_global))
-        unlink($path_repo_raw_data_serials_urls_csv_global);
+    # Глобальный файл где временно хранятся урлы для работы парсера
+    $path_repo_raw_data_urls_csv_global = $path_repo_raw_data_global . '/serials-temporal-urls.csv';
+    if (file_exists($path_repo_raw_data_urls_csv_global))
+        unlink($path_repo_raw_data_urls_csv_global);
     require 'serials/pars_serials_urls_by_pagination.php';
 } else
     Helper::error_print($error_message_invalid_user);

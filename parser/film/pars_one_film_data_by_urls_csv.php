@@ -17,7 +17,7 @@ function run_parser_save_one_film($parser_film_url, $path_file_films_hash_folder
         $file_size = trim(strval(shell_exec("wc -c $path_save_output_file")));
         $file_size_bytes = trim(str_replace($path_save_output_file, '', $file_size));
         $file_size_mb = intval(round((($file_size_bytes / 1024) / 1024), 0));
-        if ($file_size_mb >= 10) {
+        if ($file_size_mb >= $GLOBALS['max_uot_put_file_size_megabyte']) {
             $prefix = Helper::counter_output_file_prefix(true);
             $path_save_output_file = "{$path_file_films_hash_folder}__$prefix.txt";
         }
@@ -39,10 +39,10 @@ function main()
     }
     $path_file_films_hash_folder = "{$GLOBALS['path_repo_output_films_folder_global']}/$date_time_folder_name/FILMS_DATA_BY";
 
-    $file = fopen("{$GLOBALS['path_repo_raw_data_films_urls_csv_global']}", 'r');
-    if (!file_exists($GLOBALS['path_repo_raw_data_films_urls_csv_global'])) {
+    $file = fopen("{$GLOBALS['path_repo_raw_data_urls_csv_global']}", 'r');
+    if (!file_exists($GLOBALS['path_repo_raw_data_urls_csv_global'])) {
         Helper::error_print("
-    какая то хуйня - нет файла с урлами фильмов в папке {$GLOBALS['path_repo_raw_data_films_urls_csv_global']}
+    какая то хуйня - нет файла с урлами фильмов в папке {$GLOBALS['path_repo_raw_data_urls_csv_global']}
     нужно розбераться так как парсер на предыдущем этапе его создавал и писал туда урлы )) короче пиздец
         
 ");
@@ -82,7 +82,7 @@ function main()
     
     Всего спарсилось ➤ ✅ $parsed_urls_for_movies ✅ на фильмы
     
-    Все урлы на спарсенные фильмы в файле ➤ 🚀({$GLOBALS['path_repo_raw_data_films_urls_csv_global']})🚀
+    Все урлы на спарсенные фильмы в файле ➤ 🚀({$GLOBALS['path_repo_raw_data_urls_csv_global']})🚀
     
     Скрипт парсинга урлов по пагинациям сожрал памяти ➤ ⚡ {$pre_total_memory_text} ⚡
     
@@ -139,7 +139,7 @@ function main()
     
 Всего спарсилось ➤ ✅ $parsed_urls_for_movies ✅ на фильмы
     
-Все урлы на спарсенные фильмы в файле ➤ 🚀({$GLOBALS['path_repo_raw_data_films_urls_csv_global']})🚀
+Все урлы на спарсенные фильмы в файле ➤ 🚀({$GLOBALS['path_repo_raw_data_urls_csv_global']})🚀
     
     
     

@@ -4,6 +4,7 @@
  * Glob parser class
  * ---------------------------------------------------------------------------------------------------------------------
  */
+
 class ParserHD
 {
     private $html;
@@ -193,7 +194,7 @@ class ParserHD
 ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
 ∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷
             
-    Время выполнения скрипта парсинга фильмов ➤ ⌚ {$time_script_run} ⌚
+    Время выполнения скрипта парсинга Урлов ➤ ⌚ {$time_script_run} ⌚
     
     Скрипт сожрал памяти ➤ ⚡ {$total_memory_text} ⚡
 
@@ -209,7 +210,7 @@ class ParserHD
                 $film_url_slug = preg_replace('/http:\/\/hdrezka\.tv|https:\/\/hdrezka\.website|https:\/\/hdrezka\.sh|https:\/\/rezka\.ag/', '', $temp_link->href);
                 $film_name = $temp_link->plaintext;
                 $line_text = "$film_url_slug;$film_name \n";
-                file_put_contents("{$GLOBALS['path_repo_raw_data_global']}/films-temporal-urls.csv", $line_text, FILE_APPEND);
+                file_put_contents("{$GLOBALS['path_repo_raw_data_urls_csv_global']}", $line_text, FILE_APPEND);
             }
         }
         return [
