@@ -358,7 +358,7 @@ class ParserHD
 
             return (!empty($arr) && is_array($arr)) ? $arr : 'ERROR 107';
         }
-        return Helper::error_print('ERROR 355');
+        return Helper::error_print('ERROR 361');
     }
 
     public function parse_raw_one_serials_data($url)
@@ -494,6 +494,6 @@ class ParserHD
 
             return (!empty($arr) && is_array($arr)) ? $arr : 'ERROR 107';
         }
-        return Helper::error_print('ERROR 355');
+        return Helper::error_print('ERROR 497');
     }
 }
