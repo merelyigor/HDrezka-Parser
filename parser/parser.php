@@ -239,73 +239,76 @@ class ParserHD
             else
                 $arr['film_orig_title'] = null;
 
-            if ($temp_film_info->find('span.imdb')[0]->plaintext != '')
-                $arr['film_imdb_rating'] = Helper::check($temp_film_info->find('span.imdb')[0]->find('span', 0)->plaintext, '229');
-            else
-                $arr['film_imdb_rating'] = null;
+            if ($temp_film_info->innertext != '') {
+                if ($temp_film_info->find('span.imdb')[0]->plaintext != '')
+                    $arr['film_imdb_rating'] = Helper::check($temp_film_info->find('span.imdb')[0]->find('span', 0)->plaintext, '229');
+                else
+                    $arr['film_imdb_rating'] = null;
 
-            if ($temp_film_info->find('span.kp')[0]->plaintext != '')
-                $arr['film_kino_poisk_rating'] = Helper::check($temp_film_info->find('span.kp')[0]->find('span', 0)->plaintext, '234');
-            else
-                $arr['film_kino_poisk_rating'] = null;
+                if ($temp_film_info->find('span.kp')[0]->plaintext != '')
+                    $arr['film_kino_poisk_rating'] = Helper::check($temp_film_info->find('span.kp')[0]->find('span', 0)->plaintext, '234');
+                else
+                    $arr['film_kino_poisk_rating'] = null;
+
+                foreach ($temp_film_info->find('tr') as $item) {
+                    if (preg_match('/Слоган/', $item->plaintext)) {
+                        $temp = preg_replace('/&laquo;|&raquo;/', '', Helper::check($item->find('td', 1)->plaintext, '243'));
+                        $arr['film_slogan_str'] = !empty($temp) ? $temp : null;
+                    }
+                    if (preg_match('/(Дата выхода)/', $item->plaintext)) {
+                        $temp = Helper::check($item->find('td', 1)->plaintext, '247');
+                        $arr['film_year_str'] = !empty($temp) ? $temp : null;
+                        if (preg_match('/181[2-9]|18[2-9]\d|19\d\d|2\d{3}|30[0-3]\d|304[0-8]/', $arr['film_year_str'], $match)) {
+                            $temp = intval($match[0]);
+                            $arr['film_year_numb'] = !empty($temp) ? $temp : null;
+                        }
+                    }
+                    if (preg_match('/Страна/', $item->plaintext)) {
+                        $temp = Helper::check($item->find('td', 1)->plaintext, '255');
+                        $arr['film_country_str'] = !empty($temp) ? $temp : null;
+                    }
+                    if (preg_match('/Режиссер/', $item->plaintext))
+                        foreach ($item->find('a') as $value) {
+                            $temp = Helper::check($value->plaintext, '260');
+                            $arr['film_persons_arr'][] = !empty($temp) ? $temp : null;
+                        }
+                    if (preg_match('/Жанр/', $item->plaintext))
+                        foreach ($item->find('a') as $value) {
+                            $temp = Helper::check($value->plaintext, '265');
+                            $arr['film_genre_arr'][] = !empty($temp) ? $temp : null;
+                        }
+                    if (preg_match('/В качестве/', $item->plaintext)) {
+                        $temp = Helper::check($item->find('td', 1)->plaintext, '269');
+                        $arr['film_quality_str'] = !empty($temp) ? $temp : null;
+                    }
+                    if (preg_match('/В переводе/', $item->plaintext)) {
+                        $temp = Helper::check($item->find('td', 1)->plaintext, '273');
+                        $arr['film_translation_str'] = !empty($temp) ? $temp : null;
+                    }
+                    if (preg_match('/Возраст/', $item->plaintext)) {
+                        $temp = Helper::check($item->find('td', 1)->plaintext, '277');
+                        $arr['film_age_check_str'] = !empty($temp) ? $temp : null;
+                    }
+                    if (preg_match('/Время/', $item->plaintext)) {
+                        $temp = Helper::check($item->find('td', 1)->plaintext, '281');
+                        $arr['film_duration_str'] = !empty($temp) ? $temp : null;
+                    }
+                    if (preg_match('/Из серии/', $item->plaintext))
+                        foreach ($item->find('a') as $value) {
+                            $temp = Helper::check($value->plaintext, '286');
+                            $arr['film_collection_arr'][] = !empty($temp) ? $temp : null;
+                        }
+                    if (preg_match('/В ролях/', $item->plaintext))
+                        foreach ($item->find('a') as $value) {
+                            $temp = Helper::check($value->plaintext, '291');
+                            $arr['film_actors_arr'][] = !empty($temp) ? $temp : null;
+                        }
+                }
+            }
 
             $temp = preg_replace('/<br>|<br \/>|<\/br>|<\/ br>|\\n/', '', Helper::check($html->find('div.b-post__description_text')[0]->innertext, '238'));
             $arr['film_desc_str'] = !empty($temp) ? $temp : null;
 
-            foreach ($temp_film_info->find('tr') as $item) {
-                if (preg_match('/Слоган/', $item->plaintext)) {
-                    $temp = preg_replace('/&laquo;|&raquo;/', '', Helper::check($item->find('td', 1)->plaintext, '243'));
-                    $arr['film_slogan_str'] = !empty($temp) ? $temp : null;
-                }
-                if (preg_match('/(Дата выхода)/', $item->plaintext)) {
-                    $temp = Helper::check($item->find('td', 1)->plaintext, '247');
-                    $arr['film_year_str'] = !empty($temp) ? $temp : null;
-                    if (preg_match('/181[2-9]|18[2-9]\d|19\d\d|2\d{3}|30[0-3]\d|304[0-8]/', $arr['film_year_str'], $match)) {
-                        $temp = intval($match[0]);
-                        $arr['film_year_numb'] = !empty($temp) ? $temp : null;
-                    }
-                }
-                if (preg_match('/Страна/', $item->plaintext)) {
-                    $temp = Helper::check($item->find('td', 1)->plaintext, '255');
-                    $arr['film_country_str'] = !empty($temp) ? $temp : null;
-                }
-                if (preg_match('/Режиссер/', $item->plaintext))
-                    foreach ($item->find('a') as $value) {
-                        $temp = Helper::check($value->plaintext, '260');
-                        $arr['film_persons_arr'][] = !empty($temp) ? $temp : null;
-                    }
-                if (preg_match('/Жанр/', $item->plaintext))
-                    foreach ($item->find('a') as $value) {
-                        $temp = Helper::check($value->plaintext, '265');
-                        $arr['film_genre_arr'][] = !empty($temp) ? $temp : null;
-                    }
-                if (preg_match('/В качестве/', $item->plaintext)) {
-                    $temp = Helper::check($item->find('td', 1)->plaintext, '269');
-                    $arr['film_quality_str'] = !empty($temp) ? $temp : null;
-                }
-                if (preg_match('/В переводе/', $item->plaintext)) {
-                    $temp = Helper::check($item->find('td', 1)->plaintext, '273');
-                    $arr['film_translation_str'] = !empty($temp) ? $temp : null;
-                }
-                if (preg_match('/Возраст/', $item->plaintext)) {
-                    $temp = Helper::check($item->find('td', 1)->plaintext, '277');
-                    $arr['film_age_check_str'] = !empty($temp) ? $temp : null;
-                }
-                if (preg_match('/Время/', $item->plaintext)) {
-                    $temp = Helper::check($item->find('td', 1)->plaintext, '281');
-                    $arr['film_duration_str'] = !empty($temp) ? $temp : null;
-                }
-                if (preg_match('/Из серии/', $item->plaintext))
-                    foreach ($item->find('a') as $value) {
-                        $temp = Helper::check($value->plaintext, '286');
-                        $arr['film_collection_arr'][] = !empty($temp) ? $temp : null;
-                    }
-                if (preg_match('/В ролях/', $item->plaintext))
-                    foreach ($item->find('a') as $value) {
-                        $temp = Helper::check($value->plaintext, '291');
-                        $arr['film_actors_arr'][] = !empty($temp) ? $temp : null;
-                    }
-            }
 
             $arr['film_API_arr'] = $this->get_movie_poster_by_api_themoviedb($arr['film_title'], $arr['film_orig_title']);
 
@@ -349,5 +352,6 @@ class ParserHD
 
             return (!empty($arr) && is_array($arr)) ? $arr : 'ERROR 107';
         }
+        return Helper::error_print('ERROR 355');
     }
 }
