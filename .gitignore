@@ -1,9 +1,12 @@
-.idea
+### MyScript ###
 cookie.txt
-/images/images-films/
+/images/
 /RAW-DATA/
-/OUTPUT-DATA/FILMS/
-/OUTPUT-DATA/SERIALS/
+/OUTPUT-DATA/
+
+### PHPstorm ###
+.idea
+
 /test/cookie.txt
 /test/videomagic/jpg/
 /test/videomagic/vtt/
@@ -36,5 +39,3 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
-
-
