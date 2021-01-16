@@ -24,10 +24,11 @@ $path_repo_global = preg_replace('/parser/', '', __DIR__);
 $path_repo_raw_data_global = $path_repo_global . 'RAW-DATA';
 # Глобальная папка с готовыми файлами выходящими после парсинга
 $path_repo_output_data_global = $path_repo_global . 'OUTPUT-DATA';
-$path_repo_output_films_folder_global = $path_repo_output_data_global . '/FILMS';
-$path_repo_output_serials_folder_global = $path_repo_output_data_global . '/SERIALS';
-# Глобальная папка картинок фильмов которые были обработаны и спаршены
-$path_repo_images_data_global = $path_repo_global . 'images/images-films/';
+$folder_name_films_global = 'FILMS';
+$folder_name_serials_global = 'SERIALS';
+$path_repo_output_films_folder_global = "{$path_repo_output_data_global}/{$folder_name_films_global}";
+$path_repo_output_serials_folder_global = "{$path_repo_output_data_global}/{$folder_name_serials_global}";
+$path_img_global = 'IMAGES';
 
 ########################################################################################
 # Глобальные юзер агенты
@@ -48,8 +49,10 @@ $url_hdrezka_ajax_global = 'https://hdrezka.website/ajax/get_cdn_series/';
 ########################################################################################
 # Connecting dependencies and create variable + class
 ########################################################################################
-require 'helper.php';
-require 'parser.php';
+require_once 'helper.php';
+require_once 'parser.php';
+
+# Сообщение при ошибке ввода невалидных данных при настройке скрипта ❎
 $error_message_invalid_user = '
     Вы ввели какуюто хуйню
 
@@ -71,7 +74,7 @@ if (isset($argv[1]))
 ########################################################################################
 # Выбор домена для работы парсера
 ########################################################################################
-Helper::bash_escapeshellarg("printf \e[8;30;120t");
+Helper::bash_escapeshellarg("printf \e[8;60;145t"); // Задаю размер окна терминала TODO сделать нормальное заполнение экрана символами ░░ и тд
 echo Helper::header_print() . '░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 ░░░░ Выберете с какого домена парсить ?: ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -82,7 +85,7 @@ echo Helper::header_print() . '░░░░░░░░░░░░░░░░�
 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 ';
 
-$site_domain_global = intval(readline("ВВОД: "));
+$site_domain_global = 1;// intval(readline("ВВОД: ")); TODO убрать комментарий и вернуть все обратно
 if ($site_domain_global == 1)
     $site_domain_global = 'https://hdrezka.website';
 else if ($site_domain_global == 2)
@@ -119,7 +122,7 @@ echo Helper::header_print() . '░░░░░░░░░░░░░░░░�
 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 ';
 
-$proxy_type_readline = intval(readline("ВВОД: "));
+$proxy_type_readline = 2;//intval(readline("ВВОД: ")); TODO убрать комментарий и вернуть все обратно
 $proxy_type_global = false;
 if ($proxy_type_readline == 1) {
     $proxy_type_global = true;
@@ -147,7 +150,7 @@ echo Helper::header_print() . '░░░░░░░░░░░░░░░░�
 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 ';
 
-$telegram_send_status_readline = intval(readline("ВВОД: "));
+$telegram_send_status_readline = 1;// intval(readline("ВВОД: ")); TODO убрать комментарий и вернуть все обратно
 $telegram_send_status_global = false;
 if ($telegram_send_status_readline == 1)
     $telegram_send_status_global = true;
@@ -170,7 +173,7 @@ echo Helper::header_print() . '░░░░░░░░░░░░░░░░�
 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 ';
 
-$count_pagination_readline = intval(readline("ВВОД: "));
+$count_pagination_readline = 1;// intval(readline("ВВОД: ")); TODO убрать комментарий и вернуть все обратно
 $count_pagination_global = false;
 if ($count_pagination_readline != 0)
     $count_pagination_global = $count_pagination_readline;
@@ -192,18 +195,30 @@ echo Helper::header_print() . '░░░░░░░░░░░░░░░░�
 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 ';
 
-$parser_type = readline("ВВОД: ");
-if ($parser_type == 1) {
+$parser_type = 1;//readline("ВВОД: "); TODO убрать комментарий и вернуть все обратно
+if ($parser_type == 1) { # Парсим фильмы
     # Глобальный файл где временно хранятся урлы для работы парсера
-    $path_repo_raw_data_urls_csv_global = $path_repo_raw_data_global . '/films-temporal-urls.csv';
+    $file_name_temporal_urls_global = 'films-temporal-urls.csv';
+    $path_repo_raw_data_urls_csv_global = "{$path_repo_raw_data_global}/{$file_name_temporal_urls_global}";
+    # Глобальная папка картинок которые были обработаны и спаршены
+    $img_path_global = $path_img_global . '/images-films/';
+    $path_repo_images_data_global = $path_repo_global . $img_path_global;
+
     if (file_exists($path_repo_raw_data_urls_csv_global))
         unlink($path_repo_raw_data_urls_csv_global);
-    require 'film/pars_films_urls_by_pagination.php';
-} else if ($parser_type == 2) {
+
+    require_once 'type-parser/films/pars_films_urls_by_pagination.php';
+
+} else if ($parser_type == 2) { # Парсим сериалы
     # Глобальный файл где временно хранятся урлы для работы парсера
-    $path_repo_raw_data_urls_csv_global = $path_repo_raw_data_global . '/serials-temporal-urls.csv';
-//    if (file_exists($path_repo_raw_data_urls_csv_global))
-//        unlink($path_repo_raw_data_urls_csv_global);
-    require 'serials/pars_serials_urls_by_pagination.php';
+    $file_name_temporal_urls_global = 'serials-temporal-urls.csv';
+    $path_repo_raw_data_urls_csv_global = "{$path_repo_raw_data_global}/{$file_name_temporal_urls_global}";
+    # Глобальная папка картинок которые были обработаны и спаршены
+    $img_path_global = $path_img_global . '/images-serials/';
+    $path_repo_images_data_global = $path_repo_global . $img_path_global;
+
+//    if (file_exists($path_repo_raw_data_urls_csv_global)) TODO убрать комментарий и вернуть все обратно
+//        unlink($path_repo_raw_data_urls_csv_global); TODO убрать комментарий и вернуть все обратно
+    require_once 'type-parser/serials/pars_serials_urls_by_pagination.php';
 } else
     Helper::error_print($error_message_invalid_user);

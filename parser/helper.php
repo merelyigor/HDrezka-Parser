@@ -3,7 +3,7 @@
  * helper functional and class
  * ---------------------------------------------------------------------------------------------------------------------
  */
-require_once "{$GLOBALS['path_repo_global']}/library/simplehtmldom_1_9_1/simple_html_dom.php";
+require_once "library/simple_html_dom/simple_html_dom.php";
 
 function dd($var_dump)
 {
@@ -105,7 +105,8 @@ class Helper
 ░░██████╔╝╚██████╔╝╚█████╔╝╚█████╔╝███████╗██████╔╝██████╔╝██║░░░░░╚██████╔╝███████╗███████╗░░░██║░░░░░░░░░░░░░░
 ░░╚═════╝░░╚═════╝░░╚════╝░░╚════╝░╚══════╝╚═════╝░╚═════╝░╚═╝░░░░░░╚═════╝░╚══════╝╚══════╝░░░╚═╝░░░░░░░░░░░░░░
 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥';
-        return $successfully_header . $text_after_header;
+        self::clear();
+        echo $successfully_header . $text_after_header;
     }
 
     public static function error_print($error = '', $return = false)
@@ -149,11 +150,11 @@ class Helper
                 CURLOPT_TIMEOUT => 10,
                 CURLOPT_POSTFIELDS => $request_parameters
             ]);
-            curl_exec($curl);
+            $result = curl_exec($curl);
             curl_close($curl);
-        } else {
-            if ($check) {
-                self::error_print('
+            if (empty($result) || $result == false) {
+                if ($check) {
+                    self::error_print('❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗
     
     Что то не так с Telegram 🤔 поэтому сообщния от бота не будут приходить 😤 но парсер продолжит работать дальше 💪
     
@@ -161,8 +162,9 @@ class Helper
     
     После чего парсер продолжит работу и не будет показывать это сообщение!
 ', true);
-                self::bash('sleep 30');
-                $check = false;
+                    self::bash('sleep 30');
+                    $check = false;
+                }
             }
         }
     }
@@ -475,6 +477,17 @@ class Helper
     {
         if ($arr_data['action'] == 'start-tor') {
             $brew_services_start_tor = trim(strval(self::bash('brew services start tor')));
+            for ($i = 1; $i <= 10; $i++) {
+                $spinner_shark = self::spinner_shark();
+                self::header_print();
+                echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+           
+    Пожалуйста подождите
+    Стартует Tor proxy !!! {$spinner_shark}
+";
+                self::bash('sleep 1');
+            }
             if (!preg_match('/(already started)|(Successfully started)/', $brew_services_start_tor)) {
                 self::error_print('
                 
@@ -503,10 +516,12 @@ class Helper
             self::bash('brew services restart tor');
             for ($i = 1; $i <= 10; $i++) {
                 $spinner_shark = self::spinner_shark();
-                self::clear();
+                self::header_print();
                 echo "❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗
-            
-    Restart Tor !!! {$spinner_shark}
+❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗
+
+    Tor proxy перестал отвечать - подождите пока производится рестарт
+    Рестарт Tor proxy !!! {$spinner_shark}
 ";
                 self::bash('sleep 1');
             }
@@ -637,42 +652,6 @@ class Helper
             return $response;
     }
 
-    public static function get_urls_video_preg_match($string)
-    {
-        $pattern = [
-            0 => [
-                'pattern' => '/\[360p](https?.*?\.mp4):hls:manifest\.m3u8 or (https?.*?\.mp4)/',
-                'name' => '360p',
-            ],
-            1 => [
-                'pattern' => '/\[480p](https?.*?\.mp4):hls:manifest\.m3u8 or (https?.*?\.mp4)/',
-                'name' => '480p',
-            ],
-            2 => [
-                'pattern' => '/\[720p](https?.*?\.mp4):hls:manifest\.m3u8 or (https?.*?\.mp4)/',
-                'name' => '720p',
-            ],
-            3 => [
-                'pattern' => '/\[1080p](https?.*?\.mp4):hls:manifest\.m3u8 or (https?.*?\.mp4)/',
-                'name' => '1080p',
-            ],
-            4 => [
-                'pattern' => '/\[1080p Ultra](https?.*?\.mp4):hls:manifest\.m3u8 or (https?.*?\.mp4)/',
-                'name' => '1080p Ultra',
-            ],
-        ];
-
-        $result = [];
-        for ($i = 0; $i < 5; $i++) {
-            preg_match($pattern[$i]['pattern'], $string, $match);
-            $tmp1 = (!empty($match[1])) ? trim($match[1]) : "NOT Video --{$pattern[$i]['name']}--";
-            $tmp2 = (!empty($match[2])) ? trim($match[2]) : "NOT Video --{$pattern[$i]['name']}--";
-            $result['urls'][$pattern[$i]['name']][0] = str_replace('\\', '', $tmp1);
-            $result['urls'][$pattern[$i]['name']][1] = str_replace('\\', '', $tmp2);
-        }
-        return $result['urls'];
-    }
-
     public static function google_translate($text, $lang_input, $lang_uotput)
     {
         $query_data = array(
@@ -696,7 +675,8 @@ class Helper
 
     public static function stop()
     {
-        self::bash('brew services stop tor');
+        if (isset($GLOBALS['proxy_type_global']) && $GLOBALS['proxy_type_global'])
+            self::bash('brew services stop tor');
         self::clear();
         echo self::header_print(true) . '
 ❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌
