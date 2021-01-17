@@ -557,7 +557,6 @@ class Helper
 
     public static function super_duper_curl($url, $request_parameters, $method_post_enable = false, $tor_proxy_enable = false, $json_decode = false, $return = true, $user_agent_modify = false, $hash_error = '')
     {
-        static $tor_restart = 0;
         if (!preg_match('/\/$/', $url))
             $url = $url . '/';
 
@@ -577,10 +576,9 @@ class Helper
         if (!empty($user_agent_modify) && is_string($user_agent_modify))
             $user_agent = $user_agent_modify;
 
-
         # curl init
         $curl = curl_init();
-        $curl_opt_arr[CURLOPT_URL] = $url . '123';
+        $curl_opt_arr[CURLOPT_URL] = $url;
         $curl_opt_arr[CURLOPT_REFERER] = $url;
         $curl_opt_arr[CURLOPT_TIMEOUT] = 100;
         $curl_opt_arr[CURLOPT_COOKIEJAR] = 'cookie.txt';
@@ -603,75 +601,7 @@ class Helper
         if ($tor_proxy_enable) {
             $curl_opt_arr[CURLOPT_PROXY] = '127.0.0.1:9050';
             $curl_opt_arr[CURLOPT_PROXYTYPE] = CURLPROXY_SOCKS5;
-            if (!self::tor_connect()) {
-                $tor_restart++;
-                if ($tor_restart < 5) {
-                    self::tor_global_method(['action' => 'restart']);
-                    return self::super_duper_curl($url,
-                        $request_parameters,
-                        $method_post_enable,
-                        $tor_proxy_enable,
-                        $json_decode,
-                        $return,
-                        $user_agent_modify,
-                        '000='
-                    );
-                } else {
-                    $date_time = date("d/m/Y - H:i:s");
-                    $message = self::error_print('', true) . "░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-░░░ Проблема с CURLOPT_URL !!! Proxy Tor не отвечает ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-    ❌❌ порт 127.0.0.1:9050 не дал возможности использовать прокси для ссоединения больше ПЯТИ раз ! ❌❌
-░░░ Выберете ниже: Повторить или Выход! ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-░░░░░░░ 1) Повторить принудительно ссоеденение еще раз ✅ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-░░░░░░░ Q) Выход! ❎ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-";
-                    self::send_message_from_bot_telegram("
-Проблема с CURLOPT_URL !!!
-
-Серверная дата и время события ($date_time)
-
-Хеш ошибки $hash_error
-
-Место нахождения и запуска скрипта ({$_SERVER['PWD']})
-
-порт 127.0.0.1:9050 не дал возможности использовать прокси для ссоединения
-", $GLOBALS['telegram_send_status_global']);
-                    echo $message;
-                    $what_do_we_do = readline("ВВОД: ");
-                    if (intval($what_do_we_do) == 1) {
-                        $tor_restart = 0;
-                        return self::super_duper_curl($url,
-                            $request_parameters,
-                            $method_post_enable,
-                            $tor_proxy_enable,
-                            $json_decode,
-                            $return,
-                            $user_agent_modify,
-                            '0000'
-                        );
-                    } else if (strtolower(trim(strval($what_do_we_do))) == 'q') {
-                        self::header_print();
-                        echo '
-                Ты все проебал !!!
-                Начинай заново)
-';
-                        exit;
-                    } else
-                        return self::super_duper_curl($url,
-                            $request_parameters,
-                            $method_post_enable,
-                            $tor_proxy_enable,
-                            $json_decode,
-                            $return,
-                            $user_agent_modify,
-                            '0000'
-                        );
-                }
-            } else {
-                $tor_restart = 0;
-            }
+            self::super_duper_curl_check_tor_connect_error($url, $request_parameters, $method_post_enable, $tor_proxy_enable, $json_decode, $return, $user_agent_modify, $hash_error);
         }
 
         if ($method_post_enable) {
@@ -688,39 +618,30 @@ class Helper
         $response = curl_exec($curl);
         $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-
-        static $domain_count_for = 0;
-        $static_domain = $GLOBALS['site_domain_global'];
         if ($method_post_enable || $json_decode) {
             $response = json_decode($response, true);
             if ($response == false || $http_code !== 200 || empty($response) || !is_array($response)) {
-                foreach ($GLOBALS['domains_arr_global'] as $domain) {
-                    dd_($url);
-                    $url = str_replace($GLOBALS['site_domain_global'], $domain, $url);
-                    dd($url);
-                }
+                self::super_duper_curl_check_response_error(
+                    $url,
+                    $request_parameters,
+                    $method_post_enable,
+                    $tor_proxy_enable,
+                    $json_decode,
+                    $return,
+                    $user_agent_modify
+                );
             }
         } else {
             if ($response == false || $http_code !== 200 || empty($response)) {
-                for (; $domain_count_for < count($GLOBALS['domains_arr_global']);) {
-                    $domain_count_for = $domain_count_for + 1;
-                    if ($GLOBALS['domains_arr_global'][$domain_count_for] != $static_domain) {
-                        $static_domain = $GLOBALS['domains_arr_global'][$domain_count_for];
-                        dd_($url);
-                        $url = str_replace($static_domain, $static_domain, $url);
-                        dd_($url);
-                        return self::super_duper_curl($url,
-                            $request_parameters,
-                            $method_post_enable,
-                            $tor_proxy_enable,
-                            $json_decode,
-                            $return,
-                            $user_agent_modify,
-                            '0t0m'
-                        );
-                    }
-                }
-                exit;
+                self::super_duper_curl_check_response_error(
+                    $url,
+                    $request_parameters,
+                    $method_post_enable,
+                    $tor_proxy_enable,
+                    $json_decode,
+                    $return,
+                    $user_agent_modify
+                );
             }
         }
 
@@ -731,6 +652,122 @@ class Helper
         curl_close($curl);
         if ($return)
             return $response;
+    }
+
+    public static function super_duper_curl_check_response_error($url, $request_parameters, $method_post_enable, $tor_proxy_enable, $json_decode, $return, $user_agent_modify)
+    {
+        static $domain_count_for = 0;
+        static $static_domain = null;
+        $static_domain = $GLOBALS['site_domain_global'];
+
+        for (; $domain_count_for < count($GLOBALS['domains_arr_global']);) {
+            if ($static_domain != $GLOBALS['domains_arr_global'][$domain_count_for]) {
+                $static_domain = $GLOBALS['domains_arr_global'][$domain_count_for];
+                $url = preg_replace('/(https?:\/\/[\w.-]+)/', $static_domain, $url);
+                $domain_count_for = $domain_count_for + 1;
+                return self::super_duper_curl($url,
+                    $request_parameters,
+                    $method_post_enable,
+                    $tor_proxy_enable,
+                    $json_decode,
+                    $return,
+                    $user_agent_modify,
+                    '0t0m'
+                );
+            }
+            $domain_count_for = $domain_count_for + 1;
+        }
+        $url = preg_replace('/(https?:\/\/[\w.-]+)/', '', $url);
+        self::error_print("❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌
+
+    Проблемный URL-Slug $url
+    
+    Домены с которыми пробовался запрос:
+    {$GLOBALS['domains_arr_global'][0]}
+    {$GLOBALS['domains_arr_global'][1]}
+    {$GLOBALS['domains_arr_global'][2]}
+    {$GLOBALS['domains_arr_global'][3]}
+    
+    Парсер не смог получить нормальный ответ от сервера пять раз с разными доменами ❗❗❗
+
+");
+    }
+
+    public static function super_duper_curl_check_tor_connect_error($url, $request_parameters, $method_post_enable, $tor_proxy_enable, $json_decode, $return, $user_agent_modify, $hash_error)
+    {
+        static $tor_restart = 0;
+        if (!self::tor_connect()) {
+            $tor_restart++;
+            if ($tor_restart < 5) {
+                self::tor_global_method(['action' => 'restart']);
+                return self::super_duper_curl(
+                    $url,
+                    $request_parameters,
+                    $method_post_enable,
+                    $tor_proxy_enable,
+                    $json_decode,
+                    $return,
+                    $user_agent_modify,
+                    '000='
+                );
+            } else {
+                $date_time = date("d/m/Y - H:i:s");
+                $message = self::error_print('', true) . "░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░ Проблема с CURLOPT_URL !!! Proxy Tor не отвечает ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ❌❌ порт 127.0.0.1:9050 не дал возможности использовать прокси для ссоединения больше ПЯТИ раз ! ❌❌
+░░░ Выберете ниже: Повторить или Выход! ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░ 1) Повторить принудительно ссоеденение еще раз ✅ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░ Q) Выход! ❎ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+";
+                self::send_message_from_bot_telegram("
+Проблема с CURLOPT_URL !!!
+
+Серверная дата и время события ($date_time)
+
+Хеш ошибки $hash_error
+
+Место нахождения и запуска скрипта ({$_SERVER['PWD']})
+
+порт 127.0.0.1:9050 не дал возможности использовать прокси для ссоединения
+", $GLOBALS['telegram_send_status_global']);
+                echo $message;
+                $what_do_we_do = readline("ВВОД: ");
+                if (intval($what_do_we_do) == 1) {
+                    $tor_restart = 0;
+                    return self::super_duper_curl(
+                        $url,
+                        $request_parameters,
+                        $method_post_enable,
+                        $tor_proxy_enable,
+                        $json_decode,
+                        $return,
+                        $user_agent_modify,
+                        '0000'
+                    );
+                } else if (strtolower(trim(strval($what_do_we_do))) == 'q') {
+                    self::header_print();
+                    echo '
+                Ты все проебал !!!
+                Начинай заново)
+';
+                    exit;
+                } else
+                    return self::super_duper_curl(
+                        $url,
+                        $request_parameters,
+                        $method_post_enable,
+                        $tor_proxy_enable,
+                        $json_decode,
+                        $return,
+                        $user_agent_modify,
+                        '0000'
+                    );
+            }
+        } else {
+            $tor_restart = 0;
+        }
     }
 
     public static function google_translate($text, $lang_input, $lang_uotput)
