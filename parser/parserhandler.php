@@ -301,7 +301,7 @@ class ParserHandler
             'episode' => $series_counter,
         ];
 
-        Helper::show_info_serials_parsing($translator_title, $season_counter, $series_counter);
+        Helper::show_info_serials_parsing('get-seasons', ['translator_title' => $translator_title, 'season_counter' => $season_counter, 'series_counter' => $series_counter]);
         $response = Helper::super_duper_curl($url_ajax, $request_parameters, true, $GLOBALS['proxy_type_global'], false, true, false, '0026');
 
         if ($response != false && $response['success']) {
@@ -315,7 +315,7 @@ class ParserHandler
         $return_series = null;
         foreach ($season->find('li') as $series_counter => $series) {
             ++$series_counter;
-            Helper::show_info_serials_parsing($translator_title, $season_counter, $series_counter);
+            Helper::show_info_serials_parsing('get-seasons', ['translator_title' => $translator_title, 'season_counter' => $season_counter, 'series_counter' => $series_counter]);
             $series_urls = self::get_serials_urls_arr($serial_id, $translator_id, $season_counter, $translator_title, $series_counter);
             $return_series[$series_counter] = [
                 'name' => $series->plaintext,
@@ -341,14 +341,21 @@ class ParserHandler
         $response = Helper::super_duper_curl($url_ajax, $request_parameters, true, $GLOBALS['proxy_type_global'], false, true, false, '0026');
 
         if ($response != false && $response['success']) {
-            $episodes = (new simple_html_dom())->load($response['episodes']);
+            $episodes_html = (new simple_html_dom())->load($response['episodes']);
+            $seasons_html = (new simple_html_dom())->load($response['seasons']);
+            $season_number_arr = [];
+            foreach ($seasons_html->find('li') as $season_item_key => $season_item) {
+                ++$season_item_key;
+                preg_match('/(\d{1,99})/', $season_item->plaintext, $season_match_numb);
+                $season_number_arr[$season_item_key] = $season_match_numb[0];
+            }
 
-            foreach ($episodes->find('ul') as $season_counter => $season) {
+            foreach ($episodes_html->find('ul') as $season_counter => $season) {
                 ++$season_counter;
-                Helper::show_info_serials_parsing($translator_title, $season_counter);
-                $serials = self::get_serials_arr($serial_id, $translator_id, $season_counter, $translator_title, $season);
+                Helper::show_info_serials_parsing('get-seasons', ['translator_title' => $translator_title, 'season_counter' => $season_counter]);
+                $serials = self::get_serials_arr($serial_id, $translator_id, $season_number_arr[$season_counter], $translator_title, $season);
                 $return_seasons[$season_counter] = [
-                    'season' => "Сезон {$season_counter}",
+                    'season' => "Сезон {$season_number_arr[$season_counter]}",
                     'serials' => $serials
                 ];
             }
@@ -440,6 +447,7 @@ class ParserHandler
     public static function get_serial_translators_list_array($html)
     {
         $return_arr = [];
+        $translator_id = 0;
         $url = $html->find('div.b-post')[0]->find('meta', 0)->attr['content'];
         if (preg_match('/[\/](\d{1,99})[-]/', $url, $temp_match)) {
             $return_arr['serial_id'] = intval($temp_match[1]);
@@ -452,7 +460,7 @@ class ParserHandler
                 ++$translate_counter;
                 $translator_id = intval($translator_item->attr['data-translator_id']);
                 $translator_title = $translator_item->plaintext;
-                Helper::show_info_serials_parsing($translator_title);
+                Helper::show_info_serials_parsing('get-seasons', ['translator_title' => $translator_title]);
                 $seasons = self::get_seasons_and_serials_count_arr($return_arr['serial_id'], $translator_id, $translator_title);
                 $return_arr['translators'][++$translate_counter] = [
                     'translator_title' => $translator_title,
@@ -460,11 +468,11 @@ class ParserHandler
                     'seasons' => $seasons,
                 ];
             }
-            return $return_arr;
         } else {
-            $translator_id = 8;
+            preg_match('/initCDNSeriesEvents[^,]+, (\d{1,9990})[\,]/',$html->find('body')[0]->innertext,$match);
+            $translator_id = $match[1];
             $translator_title = 'default translator';
-            Helper::show_info_serials_parsing($translator_title);
+            Helper::show_info_serials_parsing('get-seasons', ['translator_title' => $translator_title]);
             $seasons = self::get_seasons_and_serials_count_arr($return_arr['serial_id'], $translator_id, $translator_title);
             $return_arr['translators'][] = [
                 'translator_title' => $translator_title,
@@ -472,7 +480,11 @@ class ParserHandler
                 'seasons' => $seasons,
             ];
         }
-        return self::return_not_found('ul#translators-list');
+
+        if (isset($return_arr['translators']) && !empty($return_arr['translators'])) {
+            return $return_arr;
+        } else
+            return self::return_not_found('ul#translators-list');
     }
 }
 

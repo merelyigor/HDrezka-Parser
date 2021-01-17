@@ -504,14 +504,14 @@ class Helper
     {
         if ($arr_data['action'] == 'start-tor') {
             $brew_services_start_tor = trim(strval(self::bash('brew services start tor')));
-            for ($i = 1; $i <= 10; $i++) {
-                $spinner_shark = self::spinner_shark();
+            for ($i = 1; $i <= 5; $i++) {
+                $loader = self::loader(5);
                 self::header_print();
                 echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
            
     Пожалуйста подождите
-    Стартует Tor proxy !!! {$spinner_shark}
+    Стартует Tor proxy !!! {$loader}
 ";
                 sleep(1);
             }
@@ -542,13 +542,13 @@ class Helper
         } elseif ($arr_data['action'] == 'restart') {
             self::bash('brew services restart tor');
             for ($i = 1; $i <= 10; $i++) {
-                $spinner_shark = self::spinner_shark();
+                $loader = self::loader(10);
                 self::header_print();
                 echo "❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗
 ❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗
 
     Tor proxy перестал отвечать - подождите пока производится рестарт
-    Рестарт Tor proxy !!! {$spinner_shark}
+    Рестарт Tor proxy !!! {$loader}
 ";
                 sleep(1);
             }
@@ -791,36 +791,50 @@ class Helper
         return $sentences;
     }
 
-    public static function show_info_serials_parsing($translator_title = '', $season_counter = '', $series_counter = '')
+    public static function show_info_serials_parsing($action, $arr_args)
     {
-        static $static_translator_title = '';
-        static $static_season_counter = '';
-        static $static_series_counter = '';
+        static $static_arr = [];
 
-        $static_translator_title = $translator_title;
-        $static_season_counter = $season_counter;
-        $static_series_counter = $series_counter;
-        $spinner = Helper::spinner();
-        $loader = Helper::loader(110);
+        if ($action == 'get-seasons') {
+            $static_arr['static_translator_title'] = $arr_args['translator_title'];
+            $static_arr['static_season_counter'] = $arr_args['season_counter'];
+            $static_arr['static_series_counter'] = $arr_args['series_counter'];
+            $spinner = Helper::spinner();
+            $loader = Helper::loader(110);
 
-        self::clear();
-        echo $GLOBALS['global_show_parsing_info'] . "
-    Парсится Озвучка    ⟾   🚀{$spinner}( {$static_translator_title} ){$spinner}🚀
+            self::clear();
+            echo $GLOBALS['global_show_parsing_info'] . "
+    Парсится Озвучка    ⟾   🚀{$spinner}( {$static_arr['static_translator_title']} ){$spinner}🚀
     
-    Парсится Сезон      ⟾   ⚡{$spinner}( {$static_season_counter} ){$spinner}⚡
+    Парсится Сезон      ⟾   ⚡{$spinner}( {$static_arr['static_season_counter']} ){$spinner}⚡
     
-    Парсится Серия      ⟾   🔥{$spinner}( {$static_series_counter} ){$spinner}🔥
+    Парсится Серия      ⟾   🔥{$spinner}( {$static_arr['static_series_counter']} ){$spinner}🔥
     
 {$loader}
 ∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷
 ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
 ";
+        } elseif ($action == 'search-translate') {
+            $static_arr['translator_id_for'] = $arr_args['translator_id_for'];
+            $spinner = Helper::spinner();
+            $loader = Helper::loader(110);
+
+            self::clear();
+            echo $GLOBALS['global_show_parsing_info'] . "
+    Ищем валидный ID перевода   ⟾   🔥{$spinner}( {$static_arr['translator_id_for']} ){$spinner}🔥
+    
+{$loader}
+∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷
+▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
+";
+        }
+
+
     }
 
     public static function stop()
     {
-        if (isset($GLOBALS['proxy_type_global']) && $GLOBALS['proxy_type_global'])
-            self::bash('brew services stop tor');
+        self::bash('brew services stop tor');
         self::clear();
         echo self::header_print(true) . '
 ❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌
