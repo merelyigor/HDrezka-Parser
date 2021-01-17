@@ -16,7 +16,7 @@ ini_set('default_socket_timeout', '100000');
 # Объявление суперглобальных переменной
 # Глобальные пути к файлам или папкам скрипта
 ########################################################################################
-# На сколко примерно мегабайт розбивать выходящий файл с данними после парсинга - СТРОГО ПИСАТЬ ТОЛЬКО ЦИФРУ !!!
+# На сколко примерно мегабайт розбивать выходящий файл с данними после парсинга - СТРОГО ПИСАТЬ ТОЛЬКО ЦИФРУ ❗
 $max_uot_put_file_size_megabyte = 10;
 # Глобальная папка скрипта
 $path_repo_global = preg_replace('/parser/', '', __DIR__);
@@ -31,7 +31,7 @@ $path_repo_output_serials_folder_global = "{$path_repo_output_data_global}/{$fol
 $path_img_global = 'IMAGES';
 
 ########################################################################################
-# Глобальные юзер агенты
+# Глобальные юзер агенты ❗
 # https://developers.whatismybrowser.com/useragents/explore/
 $user_agent_android_translate_global = 'AndroidTranslate/5.3.0.RC02.130475354-53000263 5.1 phone TRANSLATE_OPM5_TEST_1';
 $user_agent_apple_mac_os_global = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 11_1_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36';
@@ -43,8 +43,20 @@ $user_agent_apple_ipad_global = 'Mozilla/5.0 (iPad; CPU OS 14_2 like Mac OS X) A
 $films_slug_parser_global = 'films';
 $serials_slug_parser_global = 'series';
 ########################################################################################
-# Глобальные URLs HDrezka AJAX
-$url_hdrezka_ajax_global = 'https://hdrezka.website/ajax/get_cdn_series/';
+# Глобальные URLs HDrezka AJAX ❗
+$url_hdrezka_ajax_global = 'ajax/get_cdn_series';  // без слеша  конце ❗
+
+# настройки для API  themoviedb.org ❗
+$themoviedb_api_key_global = '39afda4f996c1aec7d5df75dab74bca0';
+$themoviedb_api_url_global = 'https://api.themoviedb.org/3'; // без слеша  конце ❗
+
+$domains_arr_global = [
+    0 => 'https://hdrezka.website',
+    1 => 'https://rezka.ag',
+    2 => 'https://hdrezka.sh',
+    3 => 'http://hdrezka.tv',
+];
+
 ########################################################################################
 ########################################################################################
 # Connecting dependencies and create variable + class
@@ -87,13 +99,13 @@ echo Helper::header_print() . '░░░░░░░░░░░░░░░░�
 
 $site_domain_global = 1;// intval(readline("ВВОД: ")); TODO убрать комментарий и вернуть все обратно
 if ($site_domain_global == 1)
-    $site_domain_global = 'https://hdrezka.website';
+    $site_domain_global = $domains_arr_global[0];
 else if ($site_domain_global == 2)
-    $site_domain_global = 'https://rezka.ag';
+    $site_domain_global = $domains_arr_global[1];
 else if ($site_domain_global == 3)
-    $site_domain_global = 'https://hdrezka.sh';
+    $site_domain_global = $domains_arr_global[2];
 else if ($site_domain_global == 4)
-    $site_domain_global = 'http://hdrezka.tv';
+    $site_domain_global = $domains_arr_global[3];
 else
     Helper::error_print($error_message_invalid_user);
 
@@ -150,7 +162,7 @@ echo Helper::header_print() . '░░░░░░░░░░░░░░░░�
 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 ';
 
-$telegram_send_status_readline = 1;// intval(readline("ВВОД: ")); TODO убрать комментарий и вернуть все обратно
+$telegram_send_status_readline = 2;// intval(readline("ВВОД: ")); TODO убрать комментарий и вернуть все обратно
 $telegram_send_status_global = false;
 if ($telegram_send_status_readline == 1)
     $telegram_send_status_global = true;
@@ -195,7 +207,7 @@ echo Helper::header_print() . '░░░░░░░░░░░░░░░░�
 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 ';
 
-$parser_type = 1;//readline("ВВОД: "); TODO убрать комментарий и вернуть все обратно
+$parser_type = 2;//readline("ВВОД: "); TODO убрать комментарий и вернуть все обратно
 if ($parser_type == 1) { # Парсим фильмы
     # Глобальный файл где временно хранятся урлы для работы парсера
     $file_name_temporal_urls_global = 'films-temporal-urls.csv';

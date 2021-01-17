@@ -145,8 +145,8 @@ class Helper
             $curl = curl_init();
             curl_setopt_array($curl, [
                 CURLOPT_URL => $url,
-                CURLOPT_POST => TRUE,
-                CURLOPT_RETURNTRANSFER => TRUE,
+                CURLOPT_POST => true,
+                CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_TIMEOUT => 10,
                 CURLOPT_POSTFIELDS => $request_parameters
             ]);
@@ -162,7 +162,7 @@ class Helper
     
     После чего парсер продолжит работу и не будет показывать это сообщение!
 ', true);
-                    self::bash('sleep 30');
+                    sleep(30);
                     $check = false;
                 }
             }
@@ -473,6 +473,33 @@ class Helper
         else return false;
     }
 
+    public static function api_themoviedb_connect()
+    {
+        static $check = true;
+        # request api
+        if ($check) {
+            $url = "{$GLOBALS['themoviedb_api_url_global']}/?api_key={$GLOBALS['themoviedb_api_key_global']}";
+            $curl = curl_init();
+            curl_setopt_array($curl, [
+                CURLOPT_URL => $url,
+                CURLOPT_POST => false,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT => 10,
+            ]);
+            $result = curl_exec($curl);
+            if (preg_match('/Invalid API key/', $result))
+                self::error_print('❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗
+
+    У вас невалидный API ключь themoviedb.org ❗
+    укажите актуальный валидный ключь в файле start.php
+    $themoviedb_api_key_global = \'API KEY\'
+');
+            else
+                $check = false;
+            curl_close($curl);
+        }
+    }
+
     public static function tor_global_method($arr_data)
     {
         if ($arr_data['action'] == 'start-tor') {
@@ -486,7 +513,7 @@ class Helper
     Пожалуйста подождите
     Стартует Tor proxy !!! {$spinner_shark}
 ";
-                self::bash('sleep 1');
+                sleep(1);
             }
             if (!preg_match('/(already started)|(Successfully started)/', $brew_services_start_tor)) {
                 self::error_print('
@@ -523,7 +550,7 @@ class Helper
     Tor proxy перестал отвечать - подождите пока производится рестарт
     Рестарт Tor proxy !!! {$spinner_shark}
 ";
-                self::bash('sleep 1');
+                sleep(1);
             }
         }
     }
@@ -531,7 +558,6 @@ class Helper
     public static function super_duper_curl($url, $request_parameters, $method_post_enable = false, $tor_proxy_enable = false, $json_decode = false, $return = true, $user_agent_modify = false, $hash_error = '')
     {
         static $tor_restart = 0;
-        $url = trim($url);
         if (!preg_match('/\/$/', $url))
             $url = $url . '/';
 
@@ -554,7 +580,7 @@ class Helper
 
         # curl init
         $curl = curl_init();
-        $curl_opt_arr[CURLOPT_URL] = $url;
+        $curl_opt_arr[CURLOPT_URL] = $url . '123';
         $curl_opt_arr[CURLOPT_REFERER] = $url;
         $curl_opt_arr[CURLOPT_TIMEOUT] = 100;
         $curl_opt_arr[CURLOPT_COOKIEJAR] = 'cookie.txt';
@@ -581,7 +607,15 @@ class Helper
                 $tor_restart++;
                 if ($tor_restart < 5) {
                     self::tor_global_method(['action' => 'restart']);
-                    return self::super_duper_curl($url, $request_parameters, $method_post_enable, $tor_proxy_enable, $json_decode, $return, $user_agent_modify, '000=');
+                    return self::super_duper_curl($url,
+                        $request_parameters,
+                        $method_post_enable,
+                        $tor_proxy_enable,
+                        $json_decode,
+                        $return,
+                        $user_agent_modify,
+                        '000='
+                    );
                 } else {
                     $date_time = date("d/m/Y - H:i:s");
                     $message = self::error_print('', true) . "░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -608,7 +642,15 @@ class Helper
                     $what_do_we_do = readline("ВВОД: ");
                     if (intval($what_do_we_do) == 1) {
                         $tor_restart = 0;
-                        return self::super_duper_curl($url, $request_parameters, $method_post_enable, $tor_proxy_enable, $json_decode, $return, $user_agent_modify, '0000');
+                        return self::super_duper_curl($url,
+                            $request_parameters,
+                            $method_post_enable,
+                            $tor_proxy_enable,
+                            $json_decode,
+                            $return,
+                            $user_agent_modify,
+                            '0000'
+                        );
                     } else if (strtolower(trim(strval($what_do_we_do))) == 'q') {
                         self::header_print();
                         echo '
@@ -617,7 +659,15 @@ class Helper
 ';
                         exit;
                     } else
-                        return self::super_duper_curl($url, $request_parameters, $method_post_enable, $tor_proxy_enable, $json_decode, $return, $user_agent_modify, '0000');
+                        return self::super_duper_curl($url,
+                            $request_parameters,
+                            $method_post_enable,
+                            $tor_proxy_enable,
+                            $json_decode,
+                            $return,
+                            $user_agent_modify,
+                            '0000'
+                        );
                 }
             } else {
                 $tor_restart = 0;
@@ -633,19 +683,50 @@ class Helper
             $curl_opt_arr[CURLOPT_POSTFIELDS] = http_build_query($request_parameters);
             $curl_opt_arr[CURLOPT_HTTPHEADER] = ['Accept: application/json'];
         }
+
         curl_setopt_array($curl, $curl_opt_arr);
         $response = curl_exec($curl);
         $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-        if ($method_post_enable || $json_decode)
+
+        static $domain_count_for = 0;
+        $static_domain = $GLOBALS['site_domain_global'];
+        if ($method_post_enable || $json_decode) {
             $response = json_decode($response, true);
+            if ($response == false || $http_code !== 200 || empty($response) || !is_array($response)) {
+                foreach ($GLOBALS['domains_arr_global'] as $domain) {
+                    dd_($url);
+                    $url = str_replace($GLOBALS['site_domain_global'], $domain, $url);
+                    dd($url);
+                }
+            }
+        } else {
+            if ($response == false || $http_code !== 200 || empty($response)) {
+                for (; $domain_count_for < count($GLOBALS['domains_arr_global']);) {
+                    $domain_count_for = $domain_count_for + 1;
+                    if ($GLOBALS['domains_arr_global'][$domain_count_for] != $static_domain) {
+                        $static_domain = $GLOBALS['domains_arr_global'][$domain_count_for];
+                        dd_($url);
+                        $url = str_replace($static_domain, $static_domain, $url);
+                        dd_($url);
+                        return self::super_duper_curl($url,
+                            $request_parameters,
+                            $method_post_enable,
+                            $tor_proxy_enable,
+                            $json_decode,
+                            $return,
+                            $user_agent_modify,
+                            '0t0m'
+                        );
+                    }
+                }
+                exit;
+            }
+        }
+
 
         # проверка результата ответа
 
-        if ($response == false || $http_code !== 200) {
-
-
-        }
 
         curl_close($curl);
         if ($return)

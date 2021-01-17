@@ -22,14 +22,28 @@ class Parser
 
     private function get_movie_description_by_api_themoviedb($movie_name_ru, $movie_name_en)
     {
+        # Используется API https://www.themoviedb.org/login?language=ru
+        # Документация https://developers.themoviedb.org/3/getting-started/introduction
+        if (isset($GLOBALS['themoviedb_api_key_global']) && !empty($GLOBALS['themoviedb_api_key_global'])) {
+            $api_key = $GLOBALS['themoviedb_api_key_global'];
+            Helper::api_themoviedb_connect();
+        } else
+            Helper::error_print('❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗
+
+    У вас отсутствует ключь themoviedb.org ❗
+    укажите ключь в файле start.php
+    $themoviedb_api_key_global = \'api key\'
+');
+
         $movie_name_ru = str_replace(' ', '%20', $movie_name_ru);
         $movie_name_en = str_replace(' ', '%20', $movie_name_en);
         $description_result_str = null;
         if (empty($movie_name_en))
             $movie_name_en = $movie_name_ru;
 
-        $url_api_ru = "https://api.themoviedb.org/3/search/movie?api_key=39afda4f996c1aec7d5df75dab74bca0&language=ru-RU&query=$movie_name_ru";
-        $url_api_en = "https://api.themoviedb.org/3/search/movie?api_key=39afda4f996c1aec7d5df75dab74bca0&language=en-US&query=$movie_name_en";
+        $url_api_ru = "{$GLOBALS['themoviedb_api_url_global']}/search/multi?api_key=$api_key&language=ru-RU&query=$movie_name_ru";
+        $url_api_en = "{$GLOBALS['themoviedb_api_url_global']}/search/multi?api_key=$api_key&language=en-US&query=$movie_name_en";
+
         $result_API_en = Helper::super_duper_curl($url_api_en, [], false, $GLOBALS['proxy_type_global'], true, true, false, '0005');
         if ($result_API_en['total_pages']) {
             $movie_description = preg_replace('/<br>|<br \/>|<\/br>|<\/ br>|\\n|\\r/', '', $result_API_en['results'][0]['overview']);
@@ -48,15 +62,29 @@ class Parser
 
     private function get_movie_poster_api_themoviedb_arr($movie_name_ru, $movie_name_en)
     {
+        # Используется API https://www.themoviedb.org/login?language=ru
+        # Документация https://developers.themoviedb.org/3/getting-started/introduction
+        if (isset($GLOBALS['themoviedb_api_key_global']) && !empty($GLOBALS['themoviedb_api_key_global'])) {
+            $api_key = $GLOBALS['themoviedb_api_key_global'];
+            Helper::api_themoviedb_connect();
+        } else
+            Helper::error_print('❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗
+
+    У вас отсутствует ключь themoviedb.org ❗
+    укажите ключь в файле start.php
+    $themoviedb_api_key_global = \'api key\'
+');
+
         $movie_name_ru = str_replace(' ', '%20', $movie_name_ru);
         $movie_name_en = str_replace(' ', '%20', $movie_name_en);
+
         if (empty($movie_name_en))
             $movie_name_en = $movie_name_ru;
 
         $path = 'https://www.themoviedb.org/t/p/w600_and_h900_bestv2';
         $arr = null;
-        $url_api_ru = "https://api.themoviedb.org/3/search/movie?api_key=39afda4f996c1aec7d5df75dab74bca0&language=ru-RU&query=$movie_name_ru";
-        $url_api_en = "https://api.themoviedb.org/3/search/movie?api_key=39afda4f996c1aec7d5df75dab74bca0&language=en-US&query=$movie_name_en";
+        $url_api_ru = "{$GLOBALS['themoviedb_api_url_global']}/search/multi?api_key=$api_key&language=ru-RU&query=$movie_name_ru";
+        $url_api_en = "{$GLOBALS['themoviedb_api_url_global']}/search/multi?api_key=$api_key&language=en-US&query=$movie_name_en";
 
         $result_API_ru = Helper::super_duper_curl($url_api_ru, [], false, $GLOBALS['proxy_type_global'], true, true, false, '0008');
         if ($result_API_ru['total_pages']) {
@@ -255,7 +283,7 @@ class Parser
     public function parse_raw_one_films_data($url)
     {
         $arr = [];
-        $content_html = Helper::super_duper_curl($url, [], false, $GLOBALS['proxy_type_global'], false, true, false, '0011');
+        $content_html = Helper::super_duper_curl($url, [], false, $GLOBALS['proxy_type_global'], false, true, false, 'w011');
         $html = $this->SimpleHtmlDom->load($content_html);
 
         if ($html->innertext != '') {
@@ -278,17 +306,17 @@ class Parser
 
             $arr['film_default_urls'] = ParserHandler::get_urls_video_preg_match($html, true);
 
-            $arr['film_translation_arr'] = ParserHandler::get_movie_translators_list_array($html);
+            $arr['film_translation_arr'] = ParserHandler::get_film_translators_list_array($html);
 
-            return (!empty($arr) && is_array($arr)) ? $arr : 'ERROR 107';
-        }
-        return Helper::error_print('ERROR 361');
+            return (!empty($arr) && is_array($arr)) ? $arr : 'ERROR 1wq7';
+        } else
+            return Helper::error_print('ERROR 3v6t1');
     }
 
     public function parse_raw_one_serials_data($url)
     {
         $arr = [];
-        $content_html = Helper::super_duper_curl($url, [], false, $GLOBALS['proxy_type_global'], false, true, false, '0011');
+        $content_html = Helper::super_duper_curl($url, [], false, $GLOBALS['proxy_type_global'], false, true, false, '0w11');
         $html = $this->SimpleHtmlDom->load($content_html);
 
         if ($html->innertext != '') {
@@ -303,20 +331,21 @@ class Parser
 
             $arr['serial_information'] = ParserHandler::get_movie_information_array($html);
 
-            dd($arr);
-
             $arr['serial_description_origin_ru'] = ParserHandler::get_description_origin_ru($html);
 
-            $arr['serial_description_by_api_themoviedb'] = $this->get_movie_description_by_api_themoviedb($arr['film_title'], $arr['film_orig_title']);
+            $arr['serial_description_by_api_themoviedb'] = $this->get_movie_description_by_api_themoviedb($arr['serial_title'], $arr['serial_orig_title']);
 
-            $arr['serial_poster_arr'] = $this->get_movie_poster_api_themoviedb_arr($arr['film_title'], $arr['film_orig_title']);
+            $arr['serial_poster_arr'] = $this->get_movie_poster_api_themoviedb_arr($arr['serial_title'], $arr['serial_orig_title']);
 
             $arr['serial_default_urls'] = ParserHandler::get_urls_video_preg_match($html, true);
 
-            $arr['serial_translation_arr'] = ParserHandler::get_movie_translators_list_array($html);
+            $arr['serial_all_urls_arr'] = ParserHandler::get_serial_translators_list_array($html);
 
-            return (!empty($arr) && is_array($arr)) ? $arr : 'ERROR 107';
-        }
-        return Helper::error_print('ERROR 497');
+            dd($arr);
+
+
+            return (!empty($arr) && is_array($arr)) ? $arr : 'ERROR 107wja';
+        } else
+            return Helper::error_print('ERROR 49w7syp');
     }
 }

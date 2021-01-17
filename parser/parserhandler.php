@@ -286,6 +286,63 @@ class ParserHandler
         return $arr;
     }
 
+    private static function get_serials_count_arr($serial_id, $translator_id, $season)
+    {
+        $arr = null;
+        for ($serial = 1; $serial <= 50; $serial++) {
+            $url_ajax = (isset($GLOBALS['url_hdrezka_ajax_global']))
+                ? "{$GLOBALS['site_domain_global']}/{$GLOBALS['url_hdrezka_ajax_global']}/"
+                : Helper::error_print('url_hdrezka_ajax_global error f64d0fj2');
+
+            $request_parameters = [
+                'action' => 'get_stream',
+                'id' => $serial_id,
+                'translator_id' => $translator_id,
+                'season' => $season,
+                'episode' => $serial,
+            ];
+
+            $response = Helper::super_duper_curl($url_ajax, $request_parameters, true, $GLOBALS['proxy_type_global'], false, true, false, '0026');
+            if ($response != false && $response['success']) {
+                $arr[$serial] = [
+                    'urls_arr' => self::get_urls_video_preg_match($response['url'])
+                ];
+            } else
+                continue;
+        }
+        return $arr;
+    }
+
+    private static function get_seasons_and_serials_count_arr($serial_id, $translator_id)
+    {
+        $arr = null;
+        for ($season = 1; $season <= 50; $season++) {
+            $url_ajax = (isset($GLOBALS['url_hdrezka_ajax_global']))
+                ? "{$GLOBALS['site_domain_global']}/{$GLOBALS['url_hdrezka_ajax_global']}/"
+                : Helper::error_print('url_hdrezka_ajax_global error f64d0fj2');
+
+            $request_parameters = [
+                'action' => 'get_stream',
+                'id' => $serial_id,
+                'translator_id' => $translator_id,
+                'season' => $season,
+                'episode' => 1,
+            ];
+
+            $response = Helper::super_duper_curl($url_ajax, $request_parameters, true, $GLOBALS['proxy_type_global'], false, true, false, '0026');
+            if ($response != false && $response['success']) {
+                $serials = self::get_serials_count_arr($serial_id, $translator_id, $season);
+                $arr[$season] = [
+                    'season' => "Сезон {$season}",
+                    'serials' => $serials
+                ];
+            } else {
+                continue;
+            }
+        }
+        return $arr;
+    }
+
 #   Глобальный метод получения массива информации о записи
     public static function get_movie_information_array($html)
     {
@@ -325,7 +382,7 @@ class ParserHandler
     }
 
 #   Глобальный метод получения массива ссылок с переводами
-    public static function get_movie_translators_list_array($html)
+    public static function get_film_translators_list_array($html)
     {
         $return_arr = [];
 
@@ -340,7 +397,7 @@ class ParserHandler
                 $temp['film_director'] = Helper::check($translator_item->attr['data-director'], '335');
 
                 $url_ajax = (isset($GLOBALS['url_hdrezka_ajax_global']))
-                    ? $GLOBALS['url_hdrezka_ajax_global']
+                    ? "{$GLOBALS['site_domain_global']}/{$GLOBALS['url_hdrezka_ajax_global']}/"
                     : Helper::error_print('url_hdrezka_ajax_global error f640fj2');
 
                 $request_parameters = [
@@ -361,6 +418,44 @@ class ParserHandler
                 }
                 unset($temp);
             }
+            return $return_arr;
+        } else
+            return self::return_not_found('ul#translators-list');
+    }
+
+#   Глобальный метод получения массива ссылок с переводами
+    public static function get_serial_translators_list_array($html)
+    {
+        $return_arr = [];
+
+        if ($html->find('ul#translators-list')[0]->plaintext != '') {
+            $temp_arr = [];
+            $url = $html->find('div.b-post')[0]->find('meta', 0)->attr['content'];
+            if (preg_match('/[\/](\d{1,99})[-]/', $url, $temp_match)) {
+                $temp_arr['serial_id'] = intval($temp_match[1]);
+            } else {
+                $temp_arr['serial_id'] = intval($html->find('a.show-trailer')[0]->attr['data-id']);
+            }
+
+            foreach ($html->find('li.b-translator__item') as $key => $translator_item) {
+                $translator_id = intval($translator_item->attr['data-translator_id']);
+                $seasons = self::get_seasons_and_serials_count_arr($temp_arr['serial_id'], $translator_id);
+                $temp_arr['translators'][++$key] = [
+                    'translator_title' => $translator_item->plaintext,
+                    'translator_id' => $translator_id,
+                    'seasons' => $seasons,
+                ];
+            }
+
+            dd($temp_arr);
+
+
+//            if (!empty($response)) {
+//                if (is_array($response))
+//                    $return_arr[$key]['urls'] = self::get_urls_video_preg_match($response['url'], false);
+//            }
+
+
             return $return_arr;
         } else
             return self::return_not_found('ul#translators-list');
