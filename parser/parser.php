@@ -341,9 +341,6 @@ class Parser
 
             $arr['serial_all_urls_arr'] = ParserHandler::get_serial_translators_list_array($html);
 
-            dd($arr);
-
-
             return (!empty($arr) && is_array($arr)) ? $arr : 'ERROR 107wja';
         } else
             return Helper::error_print('ERROR 49w7syp');

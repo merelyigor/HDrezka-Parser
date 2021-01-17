@@ -791,6 +791,32 @@ class Helper
         return $sentences;
     }
 
+    public static function show_info_serials_parsing($translator_title = '', $season_counter = '', $series_counter = '')
+    {
+        static $static_translator_title = '';
+        static $static_season_counter = '';
+        static $static_series_counter = '';
+
+        $static_translator_title = $translator_title;
+        $static_season_counter = $season_counter;
+        $static_series_counter = $series_counter;
+        $spinner = Helper::spinner();
+        $loader = Helper::loader(110);
+
+        self::clear();
+        echo $GLOBALS['global_show_parsing_info'] . "
+    Парсится Озвучка    ⟾   🚀{$spinner}( {$static_translator_title} ){$spinner}🚀
+    
+    Парсится Сезон      ⟾   ⚡{$spinner}( {$static_season_counter} ){$spinner}⚡
+    
+    Парсится Серия      ⟾   🔥{$spinner}( {$static_series_counter} ){$spinner}🔥
+    
+{$loader}
+∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷∷
+▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
+";
+    }
+
     public static function stop()
     {
         if (isset($GLOBALS['proxy_type_global']) && $GLOBALS['proxy_type_global'])
