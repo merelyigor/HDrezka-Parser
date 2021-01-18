@@ -675,8 +675,7 @@ class Helper
             }
             $domain_count_for = $domain_count_for + 1;
         }
-        self::error_print("❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌
-
+        $message = "
     Проблемный URL-Slug $url
     
     Домены с которыми пробовался запрос:
@@ -686,7 +685,10 @@ class Helper
     {$GLOBALS['domains_arr_global'][3]}
     
     Парсер не смог получить нормальный ответ от сервера пять раз с разными доменами ❗❗❗
-
+";
+        self::send_message_from_bot_telegram($message, $GLOBALS['telegram_send_status_global']);
+        self::error_print("❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌
+$message
 ");
     }
 
