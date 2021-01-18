@@ -92,7 +92,7 @@ function main()
     
     Текущий URL в цыкле ⟾  ({$parser_serial_url})
     
-    Счетчик количества спарсенных сериалов ➤ ✅🔥{$spinner_hourglass} ({$count_of_the_number_of_currently_parsed_movies} из {$second_parser_data['count_pars_serials']}) {$spinner_shark}
+    Счетчик количества спарсенных сериалов ➤ ✅🔥{$spinner_hourglass} ({$count_of_the_number_of_currently_parsed_movies} из {$second_parser_data['count_pars_movie']}) {$spinner_shark}
                 
     Время парсинга текущего сериала ➤ ⌚ $this_time ⌚
     
