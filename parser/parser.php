@@ -44,13 +44,13 @@ class Parser
         $url_api_ru = "{$GLOBALS['themoviedb_api_url_global']}/search/multi?api_key=$api_key&language=ru-RU&query=$movie_name_ru";
         $url_api_en = "{$GLOBALS['themoviedb_api_url_global']}/search/multi?api_key=$api_key&language=en-US&query=$movie_name_en";
 
-        $result_API_en = Helper::super_duper_curl($url_api_en, [], false, $GLOBALS['proxy_type_global'], true, true, false, '0005');
+        $result_API_en = Helper::super_duper_curl($url_api_en, [], false, $GLOBALS['proxy_type_global'], true, true, false, '0005', false);
         if ($result_API_en['total_pages']) {
             $movie_description = preg_replace('/<br>|<br \/>|<\/br>|<\/ br>|\\n|\\r/', '', $result_API_en['results'][0]['overview']);
             $translate_description = Helper::google_translate($movie_description, 'en', 'ru');
             $description_result_str = !empty($translate_description) ? trim(strip_tags($translate_description)) : null;
         } else {
-            $result_API_ru = Helper::super_duper_curl($url_api_ru, [], false, $GLOBALS['proxy_type_global'], true, true, false, '0007');
+            $result_API_ru = Helper::super_duper_curl($url_api_ru, [], false, $GLOBALS['proxy_type_global'], true, true, false, '0007', false);
             if ($result_API_ru['total_pages']) {
                 $movie_description = preg_replace('/ <br>|<br> |<br>|<br \/>|\\n|\\r/', '', $result_API_ru['results'][0]['overview']);
                 $translate_description = Helper::google_translate($movie_description, 'en', 'ru');
@@ -86,7 +86,7 @@ class Parser
         $url_api_ru = "{$GLOBALS['themoviedb_api_url_global']}/search/multi?api_key=$api_key&language=ru-RU&query=$movie_name_ru";
         $url_api_en = "{$GLOBALS['themoviedb_api_url_global']}/search/multi?api_key=$api_key&language=en-US&query=$movie_name_en";
 
-        $result_API_ru = Helper::super_duper_curl($url_api_ru, [], false, $GLOBALS['proxy_type_global'], true, true, false, '0008');
+        $result_API_ru = Helper::super_duper_curl($url_api_ru, [], false, $GLOBALS['proxy_type_global'], true, true, false, '0008', false);
         if ($result_API_ru['total_pages']) {
             $img_slug = $this->get_poster_path_exist_check($result_API_ru['results']);
             $arr['movie_poster_slug'] = $img_slug;
@@ -94,7 +94,7 @@ class Parser
             $arr['movie_poster_file_name'] = preg_replace('/^(\/)/', '', $img_slug);
             $arr['movie_poster_url'] = $path . $img_slug;
         } else {
-            $result_API_en = Helper::super_duper_curl($url_api_en, [], false, $GLOBALS['proxy_type_global'], true, true, false, '0005');
+            $result_API_en = Helper::super_duper_curl($url_api_en, [], false, $GLOBALS['proxy_type_global'], true, true, false, '0005', false);
             if ($result_API_en['total_pages']) {
                 $img_slug = $this->get_poster_path_exist_check($result_API_en['results']);
                 $arr['movie_poster_slug'] = $img_slug;

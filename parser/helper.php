@@ -555,7 +555,7 @@ class Helper
         }
     }
 
-    public static function super_duper_curl($url, $request_parameters, $method_post_enable = false, $tor_proxy_enable = false, $json_decode = false, $return = true, $user_agent_modify = false, $hash_error = '')
+    public static function super_duper_curl($url, $request_parameters, $method_post_enable = false, $tor_proxy_enable = false, $json_decode = false, $return = true, $user_agent_modify = false, $hash_error = '', $check_response = true)
     {
         if (!preg_match('/\/$/', $url))
             $url = $url . '/';
@@ -620,34 +620,32 @@ class Helper
 
         if ($method_post_enable || $json_decode) {
             $response = json_decode($response, true);
-            if ($response == false || $http_code !== 200 || empty($response) || !is_array($response)) {
-                self::super_duper_curl_check_response_error(
-                    $url,
-                    $request_parameters,
-                    $method_post_enable,
-                    $tor_proxy_enable,
-                    $json_decode,
-                    $return,
-                    $user_agent_modify
-                );
-            }
+            if ($check_response) # проверка результата ответа
+                if ($response == false || $http_code !== 200 || empty($response) || !is_array($response)) {
+                    self::super_duper_curl_check_response_error(
+                        $url,
+                        $request_parameters,
+                        $method_post_enable,
+                        $tor_proxy_enable,
+                        $json_decode,
+                        $return,
+                        $user_agent_modify
+                    );
+                }
         } else {
-            if ($response == false || $http_code !== 200 || empty($response)) {
-                self::super_duper_curl_check_response_error(
-                    $url,
-                    $request_parameters,
-                    $method_post_enable,
-                    $tor_proxy_enable,
-                    $json_decode,
-                    $return,
-                    $user_agent_modify
-                );
-            }
+            if ($check_response) # проверка результата ответа
+                if ($response == false || $http_code !== 200 || empty($response)) {
+                    self::super_duper_curl_check_response_error(
+                        $url,
+                        $request_parameters,
+                        $method_post_enable,
+                        $tor_proxy_enable,
+                        $json_decode,
+                        $return,
+                        $user_agent_modify
+                    );
+                }
         }
-
-
-        # проверка результата ответа
-
 
         curl_close($curl);
         if ($return)
@@ -677,7 +675,6 @@ class Helper
             }
             $domain_count_for = $domain_count_for + 1;
         }
-        $url = preg_replace('/(https?:\/\/[\w.-]+)/', '', $url);
         self::error_print("❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌
 
     Проблемный URL-Slug $url
@@ -779,7 +776,7 @@ class Helper
         );
         $user_agent = (isset($GLOBALS['user_agent_android_translate_global'])) ? $GLOBALS['user_agent_android_translate_global'] : '';
         $url_google_translate_api = 'https://translate.google.com/translate_a/single?client=at&dt=t&dt=ld&dt=qca&dt=rm&dt=bd&dj=1&hl=uk-RU&ie=UTF-8&oe=UTF-8&inputm=2&otf=2&iid=1dd3b944-fa62-4b55-b330-74909a99969e';
-        $arr = self::super_duper_curl($url_google_translate_api, $query_data, true, false, false, true, $user_agent, '0004');
+        $arr = self::super_duper_curl($url_google_translate_api, $query_data, true, false, false, true, $user_agent, '0004', false);
 
         $sentences = '';
         if (isset($arr['sentences'])) {
