@@ -1,4 +1,4 @@
-### MyScript ###
+# MyScript
 v1.0/cookie.txt
 v1.0/images/*
 v1.0/RAW-DATA/*
@@ -9,25 +9,19 @@ v2.0/images/*
 v2.0/RAW-DATA/*
 v2.0/OUTPUT-DATA/*
 
-### PHPstorm ###
-.idea
-
+/Netflix_spizdili/
 /test/*
 
-### macOS ###
-# General
+# PHPstorm
+.idea
+
+
+# macOS
 .DS_Store
 .AppleDouble
 .LSOverride
-
-# Icon must end with two \r
 Icon
-
-
-# Thumbnails
 ._*
-
-# Files that might appear in the root of a volume
 .DocumentRevisions-V100
 .fseventsd
 .Spotlight-V100
@@ -35,8 +29,6 @@ Icon
 .Trashes
 .VolumeIcon.icns
 .com.apple.timemachine.donotpresent
-
-# Directories potentially created on remote AFP share
 .AppleDB
 .AppleDesktop
 Network Trash Folder
