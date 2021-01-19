@@ -1,15 +1,13 @@
 ### MyScript ###
 cookie.txt
-/images/
-/RAW-DATA/
-/OUTPUT-DATA/
+/images/*
+/RAW-DATA/*
+/OUTPUT-DATA/*
 
 ### PHPstorm ###
 .idea
 
-/test/cookie.txt
-/test/videomagic/jpg/
-/test/videomagic/vtt/
+/test/*
 
 ### macOS ###
 # General
