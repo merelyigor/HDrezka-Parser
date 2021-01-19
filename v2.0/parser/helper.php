@@ -663,6 +663,8 @@ class Helper
                 $static_domain = $GLOBALS['domains_arr_global'][$domain_count_for];
                 $url = preg_replace('/(https?:\/\/[\w.-]+)/', $static_domain, $url);
                 $domain_count_for = $domain_count_for + 1;
+                self::tor_global_method(['action' => 'restart']);
+                sleep(5);
                 return self::super_duper_curl($url,
                     $request_parameters,
                     $method_post_enable,
