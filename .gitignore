@@ -1,8 +1,13 @@
 ### MyScript ###
-cookie.txt
-/images/*
-/RAW-DATA/*
-/OUTPUT-DATA/*
+v1.0/cookie.txt
+v1.0/images/*
+v1.0/RAW-DATA/*
+v1.0/OUTPUT-DATA/*
+
+v2.0/cookie.txt
+v2.0/images/*
+v2.0/RAW-DATA/*
+v2.0/OUTPUT-DATA/*
 
 ### PHPstorm ###
 .idea
