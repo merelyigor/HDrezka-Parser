@@ -398,7 +398,9 @@ class ParserHandler
             }
             return $return_arr;
         } else
-            return self::return_not_found('table.b-post__info');
+            return self::return_not_found('
+    table.b-post__info
+');
     }
 
 #   Глобальный метод получения массива ссылок с переводами
