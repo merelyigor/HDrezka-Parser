@@ -664,7 +664,7 @@ class Helper
                 $url = preg_replace('/(https?:\/\/[\w.-]+)/', $static_domain, $url);
                 $domain_count_for = $domain_count_for + 1;
                 self::tor_global_method(['action' => 'restart']);
-                sleep(5);
+                sleep(10);
                 return self::super_duper_curl($url,
                     $request_parameters,
                     $method_post_enable,
