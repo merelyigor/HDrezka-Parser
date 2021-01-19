@@ -308,9 +308,14 @@ class Parser
 
 //            $arr['film_translation_arr'] = ParserHandler::get_film_translators_list_array($html);
 
-            return (!empty($arr) && is_array($arr)) ? $arr : 'ERROR 1wq7';
+            return (!empty($arr) && is_array($arr)) ? $arr : 'ERROR 1w6q7f9';
         } else
-            return Helper::error_print('ERROR 3v6t1');
+            return Helper::error_print("
+    $url
+    ERROR 3v6t31d ❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗
+    
+    $content_html
+");
     }
 
     public function parse_raw_one_serials_data($url)
@@ -341,8 +346,13 @@ class Parser
 
 //            $arr['serial_all_urls_arr'] = ParserHandler::get_serial_translators_list_array($html);
 
-            return (!empty($arr) && is_array($arr)) ? $arr : 'ERROR 107wja';
+            return (!empty($arr) && is_array($arr)) ? $arr : 'ERROR 1c04v76wja';
         } else
-            return Helper::error_print('ERROR 49w7syp');
+            return Helper::error_print("
+    $url
+    ERROR 49w7sy3p ❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗
+    
+    $content_html
+");
     }
 }
